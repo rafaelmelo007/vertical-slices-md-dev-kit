@@ -31,45 +31,142 @@ The methodology itself is documented in [`vertical-slices-ai-framework.md`](./ve
 
 ## Getting started
 
-### Install — 60-second adoption preview
+### Install
+
+**The kit is markdown + a few shell scripts.** No installer to run, no package to publish. Drop it into your repo via your AI assistant or via `degit`.
+
+#### Recommended: clone the kit, ask your AI to apply it
 
 ```bash
-# 1. Vendor the kit into your repo (pick one)
-git submodule add https://github.com/rafaelmelo007/vertical-slices-md-dev-kit.git docs/bundle
-# OR a shallow copy:
-git clone --depth 1 https://github.com/rafaelmelo007/vertical-slices-md-dev-kit.git /tmp/vskit \
-  && cp -r /tmp/vskit/. docs/bundle/
-
-# 2. Install the Stop hook
-mkdir -p .claude
-cat docs/bundle/settings.json.snippet >> .claude/settings.json   # merge by hand if file exists
-
-# 3. Make the hook script executable + point at it
-chmod +x docs/bundle/scripts/worklog-stop-hook.sh
-
-# 4. Bootstrap the doc tree
-mkdir -p docs/{prds,features,worklog,incidents,process,technical}
-
-# 5. Copy one template and start your first feature
-cp docs/bundle/templates/SPEC.md docs/features/my-first-feature/SPEC.md
-
-# 6. Edit your CLAUDE.md to point at the framework
-cat docs/bundle/templates/CLAUDE.md-snippet.md   # paste into CLAUDE.md
+# Clone once, anywhere on disk
+git clone https://github.com/rafaelmelo007/vertical-slices-md-dev-kit.git ~/vskit
 ```
+
+Then in your target repo, with Claude Code (or Cursor / Aider / any AI assistant with file access) open, paste this prompt:
+
+> Apply the vertical-slices-md-dev-kit bundle from `~/vskit` to this repo, following its `ADOPTION.md` guide. Stop and ask before any destructive change.
+
+Your AI will: copy the bundle into `docs/bundle/`, install the Stop hook into `.claude/settings.json`, scaffold the `docs/` tree, paste the snippet into `CLAUDE.md`, and pause if anything in your repo would be overwritten. Total time: ~1 minute.
+
+#### Alternative: copy without AI (`degit`)
+
+```bash
+npx degit rafaelmelo007/vertical-slices-md-dev-kit docs/bundle
+```
+
+Then follow `docs/bundle/ADOPTION.md` for the Stop hook + doc tree + CLAUDE.md steps (~5 minutes of mechanical work).
 
 Full walkthrough → [`ADOPTION.md`](./ADOPTION.md)
 
+<details>
+<summary><strong>Other ways to vendor the kit</strong></summary>
+
+```bash
+# git submodule (preserves upstream history; pulls updates with `git submodule update`)
+git submodule add https://github.com/rafaelmelo007/vertical-slices-md-dev-kit.git docs/bundle
+
+# shallow clone + copy (snapshot-in-time; no upstream tracking)
+git clone --depth 1 https://github.com/rafaelmelo007/vertical-slices-md-dev-kit.git /tmp/vskit \
+  && cp -r /tmp/vskit/. docs/bundle/ \
+  && rm -rf docs/bundle/.git
+```
+
+</details>
+
 ### Commands — what they do and what they write
 
-> Full simulated end-to-end run → [`WALKTHROUGH.md`](./WALKTHROUGH.md) covers every command in the order a real adoption flows. The snippets below are excerpts; WALKTHROUGH has the complete context.
+> Full simulated end-to-end run with every command's terminal output → [`WALKTHROUGH.md`](./WALKTHROUGH.md)
 
-Every command is target-aware and writes specific artifacts. Spec versus invocation matters: `/vskit:critique spec <slug>` operates on one feature; `/vskit:project-status` reads everything and writes nothing. Commands fall into eight groups.
+Every command is target-aware (`<slug>`, `<prd-path>`) and writes specific artifacts. The whole vocabulary in nine phase tables, then four inline walkthroughs for the commands that drive 80% of daily flow.
 
-#### 1. Setup (one-shot per repo)
+#### Setup
 
-##### `/vskit:init-framework`
+| Command | Purpose | Writes? |
+|---|---|---|
+| `/vskit:init-framework` | Scaffold doc tree, install Stop hook, write CLAUDE.md stub, install pre-push hook | yes — full `docs/` + `.claude/` + hooks |
+| `/vskit:init-prototypes` | Sub-init when a feature adds `prototype` to Applies (creates htpasswd + nginx snippet) | yes — htpasswd |
 
-Scaffolds the doc tree, installs the Stop hook, writes the CLAUDE.md commands stub, optionally installs a pre-push hook.
+#### PRD phase
+
+| Command | Purpose | Writes? |
+|---|---|---|
+| `/vskit:review prd <prd-path>` | Round-table: 11 specialists score 0–10 in parallel until all ≥ 9 | yes — PRD score rows |
+| `/vskit:critique prd <prd-path>` | Specialists interrogate; adds inline `> Q:` questions | yes — PRD annotations + §13 |
+| `/vskit:prd-to-features <prd-path>` | Extract §6 features and scaffold `docs/features/<slug>/` | yes — feature stubs |
+
+#### Per-feature spec → ship
+
+| Command | Purpose | Writes? |
+|---|---|---|
+| `/vskit:critique spec <slug>` | Interrogate SPEC; **propagates each decision to its canonical file in the same run** | yes — SPEC + DBSCHEMA + INTERFACE-CONTRACTS + DECISIONS |
+| `/vskit:spec-to-tasks feature <slug>` | Break ACs into TASKS rows; tag decision-driven ones | yes — TASKS rows |
+| `/vskit:implement feature <slug>` | Write code; commits carry `Closes-AC:` + `Decision:` trailers | yes — source + commits |
+| `/vskit:test feature <slug>` | Run tests scoped to feature's `Touches:` pathspec | yes — SCORE test-coverage notes |
+| `/vskit:score feature <slug>` | 8 parallel scorers across 8 quality dimensions (cached) | yes — full SCORE.md update |
+| `/vskit:prototype feature <slug>` | UX prototype HTML from SPEC §3 ACs | yes — `prototypes/` |
+| `/vskit:ship feature <slug>` | Orchestrator: test → score → check deploy → deploy | yes — score history row |
+
+#### Clauses (invariant rules, v1.8+)
+
+| Command | Purpose | Writes? |
+|---|---|---|
+| `/vskit:clause add <slug> "<rule>" --severity=<...>` | Append new clause + auto-baseline check | yes — CLAUSES.md row |
+| `/vskit:clause check <slug> [<id>]` | Re-evaluate clauses against current SPEC + code | yes — verdicts, confidence, top-5 files |
+| `/vskit:clause list <slug>` | List active clauses, filterable by status | no |
+| `/vskit:clause update <slug> <id> "<rule>"` | Edit rule/severity; supersedes the old row | yes |
+| `/vskit:clause remove <slug> <id>` | Move to Removed/Superseded with reason + final verdict | yes |
+| `/vskit:clause check-all` | Run check across every feature with `clauses` in Applies | yes |
+| `/vskit:clause audit` | Read-only scan for stale + failing clauses across all features | no |
+
+#### Status & navigation (read-only)
+
+| Command | Purpose | Writes? |
+|---|---|---|
+| `/vskit:project-status` | Feature states, scores, blockers across the whole repo | no |
+| `/vskit:show-backlog` | Aggregated open tasks, filterable by status/owner/priority | no |
+| `/vskit:next-task` | Single highest-priority unblocked task | no |
+| `/vskit:open-questions` | Aggregate unresolved §9 questions from all SPECs | no |
+
+#### Audits & quality
+
+| Command | Purpose | Writes? |
+|---|---|---|
+| `/vskit:audit-traceability` | Scan `git log` for `Closes-AC:` trailers on every non-merge commit | no |
+| `/vskit:audit spec [<slug>]` | SPEC §4.3 completeness + `Touches:` correctness + INC↔SPEC conflicts | no |
+| `/vskit:security-review` | security-specialist audits the full codebase | yes — `incidents/` on findings |
+| `/vskit:report-overhead` | Last 7 days of worklog: tokens, wallclock, top commands, budget check | side-effect — archives 90+ day worklogs |
+
+#### Tests & health
+
+| Command | Purpose | Writes? |
+|---|---|---|
+| `/vskit:run-tests` | Repo-specific full suite | yes — SCORE notes |
+| `/vskit:run-e2e` | E2E tests only; screenshots on failure | yes — screenshots |
+| `/vskit:health-check` | Hit health endpoints for app + dependencies | no |
+
+#### Ship
+
+| Command | Purpose | Writes? |
+|---|---|---|
+| `/vskit:check deploy` | Read-only ship-gate evaluation across every feature | no |
+| `/vskit:deploy` | Repo-specific deploy command (always runs `/vskit:check deploy` first) | yes — waiver row if soft-block |
+| `/vskit:ship-all` | For each feature in Spec Ready or Testing: `/vskit:ship` | yes |
+| `/vskit:run-pipeline prd <prd-path>` | Full end-to-end orchestrator: round-table → critique → features → ship | yes |
+
+#### Utility
+
+| Command | Purpose | Writes? |
+|---|---|---|
+| `/vskit:score-all` | `/vskit:score feature` for every feature (honors cache) | yes when not cached |
+| `/vskit:gen-prototype-index` | Regenerate `docs/prototypes/index.html` from feature folders | yes |
+
+---
+
+### Four exemplary walkthroughs
+
+The four commands that drive 80% of the daily flow, shown with full output. The rest follow the same shape — see [`WALKTHROUGH.md`](./WALKTHROUGH.md) for every command exercised end-to-end on one feature.
+
+#### `/vskit:init-framework` — the only command you run once
 
 ```
 $ /vskit:init-framework
@@ -84,62 +181,9 @@ Done. Next step: write your first PRD draft at docs/prds/draft/<date>-<slug>.md
 
 **Writes:** full `docs/` tree, `CLAUDE.md`, `.claude/settings.json`, `.claude/scripts/worklog-stop-hook.sh`, `.git/hooks/pre-push`, worklog row.
 
-#### 2. PRD phase (per product, once until promoted)
+#### `/vskit:critique spec <slug>` — the decision-propagation contract in action
 
-##### `/vskit:review prd <prd-path>`
-
-Round-table: 11 specialists score the PRD 0–10 in parallel. Iterates until all ≥ 9.
-
-```
-$ /vskit:review prd docs/prds/draft/2026-05-23-clickcount.md
-[review] Round 1 — launching 11 specialists in parallel
-  product-owner       → 7  ("§3 customer evidence has 2 verbatim signals, needs ≥3")
-  task-manager        → 9
-  backend-lead        → 8  ("§7 missing rate-limit baseline")
-  testing-lead        → 6  ("§2 metric 'fast' not measurable")
-  ...
-Round 1: min 6 (testing-lead). Revise and re-run.
-
-[review] Round 2 — all scores ≥ 9 ✓
-PRD ready to promote.
-```
-
-**Writes:** PRD `## Round-Table Scores` rows + `## Score History` row per round.
-
-##### `/vskit:critique prd <prd-path>`
-
-Specialists interrogate the promoted PRD for weak evidence and vague metrics. Adds inline `> Q:` questions.
-
-```
-$ /vskit:critique prd docs/prds/2026-05-23-clickcount.md
-[critique] interrogating PRD as prompt-engineer
-  Q1: §1 says "fast and reliable" — what's fast? what's reliable?
-  Q2: §6 F-03 description is "tracking endpoint" — measured how?
-  Q3: §13 row "should we cache?" has no owner.
-3 inline questions added.
-```
-
-**Writes:** Inline `> Q:` annotations + `## §13 Open Questions` rows in the PRD.
-
-##### `/vskit:prd-to-features <prd-path>`
-
-Extracts §6 feature list and scaffolds `docs/features/<slug>/` for each.
-
-```
-$ /vskit:prd-to-features docs/prds/2026-05-23-clickcount.md
-[prd-to-features] F-01: ingest         → docs/features/ingest/
-[prd-to-features] F-02: query          → docs/features/query/
-[prd-to-features] F-03: demo-counter   → docs/features/demo-counter/
-3 feature folders created. Next: /vskit:critique spec <slug> for each.
-```
-
-**Writes:** `docs/features/<slug>/{SPEC,TASKS,SCORE,DECISIONS}.md` stubs per feature.
-
-#### 3. Per-feature spec → implementation
-
-##### `/vskit:critique spec <slug>`
-
-Specialists interrogate the SPEC for weak ACs, missing NFRs, edge cases. **For every decision raised, appends a DECISIONS row AND propagates the change to the canonical file in the same run** (propagation contract).
+Each decision raised by a specialist appends a DECISIONS row AND updates the canonical file it changes, in the same run. Orphan decisions are forbidden — that's the propagation contract.
 
 ```
 $ /vskit:critique spec demo-counter
@@ -164,75 +208,9 @@ Documentation score now: 9. Spec ready for /vskit:spec-to-tasks.
 
 **Writes:** Updates to `SPEC.md` (§3, §4, §9), `DBSCHEMA.md`, `INTERFACE-CONTRACTS.md`; appends `D-NN` and `DEF-NN` rows to `DECISIONS.md`.
 
-##### `/vskit:spec-to-tasks feature <slug>`
+#### `/vskit:score feature <slug>` — 8 dimensions + ship-gate logic
 
-Breaks SPEC §3 ACs into TASKS.md rows. Tasks driven by a /critique decision get the `Decision: D-NN` column populated.
-
-```
-$ /vskit:spec-to-tasks feature demo-counter
-[spec-to-tasks] reading SPEC.md §3 (8 ACs) + DECISIONS.md (5 decisions)
-
-  T-01  Add `clicks` table + index migration M-01   db-architect  High  AC-01,05,08  —
-  T-02  Implement POST /click handler               backend-lead  High  AC-01,02     —
-  T-04  Campaign-length cap 64 chars + NFC           backend-lead  Med   AC-03        D-02
-  T-05  Per-IP rate limiter                         backend-lead  High  AC-04        D-01
-  T-06  Structured logging; scrub IPs               devops-lead   Med   AC-07        D-03
-  ...
-
-10 tasks created. 4 tagged with Decision source.
-Feature now in lifecycle state: Spec Ready.
-```
-
-**Writes:** Rows appended to `TASKS.md`.
-
-##### `/vskit:implement feature <slug>`
-
-Implements all Pending tasks. **Commits carry `Closes-AC: <slug>#AC-NN` and (when applicable) `Decision: <slug>#D-NN` trailers.**
-
-```
-$ /vskit:implement feature demo-counter
-[implement] checking implementation gate (§10.2)... ✓
-[implement] dispatching tasks to owners
-
-  T-02 → backend-lead ... writing server/click/handler.rs
-         committing: "feat(click): POST handler with validation"
-         trailer: Closes-AC: demo-counter#AC-01 demo-counter#AC-02
-         ✓ T-02 → Done
-
-  T-05 → backend-lead ... committing: "feat(click): per-IP rate limit 60/min"
-         trailer: Closes-AC: demo-counter#AC-04  Decision: demo-counter#D-01
-         ✓ T-05 → Done
-
-  T-06 → devops-lead ... structured logs (in progress)
-         ⚠ T-06 → In Progress (AC-07 not yet satisfied)
-
-5 tasks Done · 2 In Progress · 1 In Review · 2 Pending
-feature state now: In Development
-```
-
-**Writes:** Source files (varies by feature); TASKS.md row statuses; git commits with trailers.
-
-##### `/vskit:test feature <slug>`
-
-Runs tests scoped to the feature's `Touches:` pathspec. Reports pass/fail and any contract violations.
-
-```
-$ /vskit:test feature demo-counter
-[test] running tests scoped to Touches: [server/click/**]
-  TC-01 unit validation       . . . PASS (12 assertions)
-  TC-02 unit rate-limit math  . . . PASS (8 assertions)
-  TC-04 concurrency           . . . FAIL (T-08 in progress)
-  AC-07 logging contract      . . . FAIL (T-06 in progress — peer_addr leaks)
-
-3 PASS · 1 FAIL · 1 SKIP · 1 contract-fail
-Drift found: server/click/handler.rs:42 logs req.peer_addr() — violates D-03.
-```
-
-**Writes:** Updates to `SCORE.md` §test-coverage notes.
-
-##### `/vskit:score feature <slug>`
-
-8 parallel scorers evaluate the feature. **Cached** if `git diff <last_scored_sha>..HEAD -- <feature scope>` is clean.
+Eight scorers run in parallel. Each dimension has a named owner; the composite is the mean but the gate enforces *every dim ≥ 7* and *security ≥ 8* independently.
 
 ```
 $ /vskit:score feature demo-counter
@@ -264,162 +242,9 @@ last_scored_sha updated → b9e4d22
 
 **Writes:** Full SCORE.md update (8 rows, composite, history row, drift findings, improvement actions); `last_scored_sha` field.
 
-#### 4. Clauses (invariant rules, v1.8+)
+#### `/vskit:ship feature <slug>` — orchestrated ship
 
-##### `/vskit:clause add <slug> "<rule>" --severity=<...>`
-
-Adds a new clause. Auto-runs `/vskit:clause check` for baseline verdict.
-
-```
-$ /vskit:clause add demo-counter "Client IP addresses must never appear in log lines" --severity=high
-[clause add] creating CLAUSES.md (was missing) · Applies: clauses appended to SPEC
-[clause add] appending CLA-01 (severity High)
-[clause add] running baseline check
-  spec  → PASS  (94%) — anchored in SPEC §3 AC-07, DECISIONS D-03
-  code  → FAIL  (92%) — server/click/handler.rs:42 logs req.peer_addr()
-
-CLA-01 created. Verdict: FAIL @ 92% (HARD BLOCK per §10.3 v1.8).
-```
-
-**Writes:** `CLAUSES.md` (file + row); SPEC `Applies:` field if missing; worklog row.
-
-##### `/vskit:clause check <slug> [<clause-id>]`
-
-Re-evaluates one or all active clauses against current SPEC and code.
-
-```
-$ /vskit:clause check demo-counter
-[clause check] re-checking 3 active clauses against HEAD (b9e4d22)
-  CLA-01 [High]    spec → PASS 94% · code → FAIL 92% (transition: FAIL → FAIL)
-  CLA-02 [Medium]  spec → PASS 96% · code → PASS 88%
-  CLA-03 [Medium]  spec → PASS 88% · code → PASS 85%
-
-Summary: 1 FAIL · 2 PASS
-Ship-gate effect: HARD BLOCK (CLA-01 High + FAIL + 92% ≥ 80%)
-exit code: 1
-```
-
-**Writes:** Updates to CLAUSES.md rows (verdicts, confidence, files, reasoning).
-
-##### `/vskit:clause list <slug> [--status=<pass|fail|stale|indeterminate>]`
-
-Read-only report of clauses for a feature.
-
-```
-$ /vskit:clause list demo-counter
-Active clauses for demo-counter (3):
-  CLA-01  [High]    FAIL  @ 92%   code 2026-05-23  spec 2026-05-23
-          "Client IP addresses must never appear in log lines"
-  CLA-02  [Medium]  PASS  @ 88%   code 2026-05-23  spec 2026-05-23
-          "All campaign strings must be NFC-normalized before any DB write"
-  ...
-```
-
-**Writes:** Nothing — read-only.
-
-Other clause commands (`/vskit:clause update`, `/vskit:clause remove`, `/vskit:clause audit`, `/vskit:clause check-all`) are listed in the reference table at the bottom of this section.
-
-#### 5. Status & navigation (read-only)
-
-##### `/vskit:project-status`
-
-Reads all SPEC.md files; prints feature states, priorities, composite scores, and blockers.
-
-```
-$ /vskit:project-status
-vertical-slices-md-dev-kit v2.0 — clickcount @ HEAD b9e4d22
-
-FEATURE        STATE              PRIORITY  COMPOSITE  BLOCKERS
-ingest         Backlog            High      —          —
-query          Backlog            Medium    —          —
-demo-counter   In Development     Medium    7.4/10     SOFT BLOCK on ship
-
-Failing dims (demo-counter):  Logging(5)  Test-Coverage(6)  NFR(6)
-Security:                     8 ✓ (hard floor cleared)
-```
-
-**Writes:** Nothing — read-only.
-
-##### `/vskit:next-task`
-
-Recommends the single highest-priority unblocked task across all features.
-
-```
-$ /vskit:next-task
-Highest-priority unblocked task: T-08 (High)
-  Unit + integration tests (TC-01..TC-04) — testing-lead — demo-counter
-  Closes: Test Coverage floor (6 → ≥7 needed for ship)
-```
-
-**Writes:** Nothing — read-only.
-
-#### 6. Audits & quality
-
-##### `/vskit:audit-traceability`
-
-Scans `git log` for `Closes-AC:` trailers on every non-merge commit. Exit non-zero if any commit lacks one.
-
-```
-$ /vskit:audit-traceability
-[audit] scanning 6 non-merge commits since v1.8
-  a3f7c12  chore: adopt vertical-slices-md-dev-kit v2.0   ✓ Closes-AC: bootstrap#AC-01
-  e5f9a34  feat(click): POST handler with validation       ✓ Closes-AC: demo-counter#AC-01,02
-  17b1c56  feat(click): cap campaign at 64 chars, NFC      ✓ Closes-AC: demo-counter#AC-03  Decision: D-02
-  ...
-
-6/6 commits trace to an AC. 0 warnings. exit code: 0
-```
-
-**Writes:** Nothing — read-only.
-
-##### `/vskit:report-overhead`
-
-Aggregates the last 7 days of worklog and reports token usage, wallclock, top commands, breach status against the weekly budget.
-
-```
-$ /vskit:report-overhead
-Repo: clickcount
-Window: 2026-05-19 → 2026-05-25 (last 7 days)
-Tokens: ~64k / 100k budget   [OK]
-Wallclock: 6h 22m
-Top commands:
-  /vskit:implement feature demo-counter   ~22k
-  /vskit:critique spec demo-counter       ~14k
-  /vskit:review prd                       ~12k
-  /vskit:score feature demo-counter       ~8k
-Status: OK (week 1 — no breach)
-
-Estimates marked ~
-```
-
-**Writes:** Side effect — archives worklog files older than 90 days into `docs/worklog/_archive/YYYY-MM.md`.
-
-#### 7. Ship
-
-##### `/vskit:check deploy`
-
-Read-only ship-gate evaluation across every feature. Exit 0 if all pass, 1 if any hard-block, 2 if soft-block-only.
-
-```
-$ /vskit:check deploy
-[check deploy] read-only ship-gate evaluation
-
-  ingest         — Backlog (not deployable)
-  query          — Backlog (not deployable)
-  demo-counter   — Composite 8.5  Security 8  Tasks 10/10 Done  Trailers ✓  Decisions ✓
-                  Clauses: 3/3 PASS (CLA-01 H ✓ CLA-02 M ✓ CLA-03 M ✓)
-                  ✓ HARD floor cleared
-                  ✓ SOFT floor cleared
-
-Deployable features: demo-counter
-exit code: 0
-```
-
-**Writes:** Nothing — read-only.
-
-##### `/vskit:ship feature <slug>` (orchestrator)
-
-Chains `/vskit:test` → `/vskit:score` → `/vskit:check deploy` → `/vskit:deploy`. Halts on the first failure; partial progress is preserved.
+Chains test → score → check deploy → deploy. Halts on the first failure; partial progress is preserved on disk.
 
 ```
 $ /vskit:ship feature demo-counter
@@ -434,32 +259,9 @@ Feature lifecycle now: Shipped.
 
 **Writes:** SCORE.md `## Score History` row; build artifacts via repo-specific deploy command.
 
-#### 8. Reference table — remaining commands
+### When commands write a waiver
 
-| Command | Purpose | Writes? |
-|---|---|---|
-| `/vskit:init-prototypes` | Conditional sub-init when a feature adds `prototype` to Applies. Creates htpasswd + nginx config snippet. | yes (htpasswd) |
-| `/vskit:prototype feature <slug>` | UX specialist generates HTML prototype from SPEC §3 ACs. | yes (prototypes/) |
-| `/vskit:clause update <slug> <id> "<rule>"` | Edit clause rule or severity. Supersedes the old row; auto-runs check. | yes |
-| `/vskit:clause remove <slug> <id>` | Move clause to Removed/Superseded with reason and final verdict. | yes |
-| `/vskit:clause audit` | Read-only scan of stale + failing clauses across all features. | no |
-| `/vskit:clause check-all` | Run `/vskit:clause check` for every feature with `clauses` in Applies. | yes |
-| `/vskit:show-backlog` | Aggregated open tasks across all features, filterable. | no |
-| `/vskit:open-questions` | Aggregate unresolved §9 Open Questions from all SPECs. | no |
-| `/vskit:audit spec [<slug>]` | Audit SPEC §4.3 completeness + Touches correctness + INC↔SPEC conflicts. | no |
-| `/vskit:security-review` | security-specialist audits the full codebase. | yes (if findings → incidents/) |
-| `/vskit:run-tests` | Repo-specific full test suite. | updates SCORE.md test-coverage notes |
-| `/vskit:run-e2e` | End-to-end tests only. Screenshots on failure. | yes (screenshots/) |
-| `/vskit:health-check` | Hit health endpoints for app + dependencies. | no |
-| `/vskit:gen-prototype-index` | Regenerate `docs/prototypes/index.html` from feature folders. | yes |
-| `/vskit:score-all` | Run `/vskit:score feature` across all features (honors cache). | yes (when not cached) |
-| `/vskit:deploy` | Repo-specific deploy command (always runs `/vskit:check deploy` first). | yes (waiver row if soft-block) |
-| `/vskit:ship-all` | For each feature in Spec Ready or Testing: `/vskit:ship`. | yes |
-| `/vskit:run-pipeline prd <prd-path>` | End-to-end orchestrator: `/vskit:review prd` → `/vskit:critique prd` → `/vskit:prd-to-features` → per-feature pipeline. | yes |
-
-#### When commands write a waiver
-
-`/vskit:deploy` (and the `/vskit:ship` orchestrator that calls it) is the only place a **logged waiver** can be created. On a soft-block, the command prompts:
+`/vskit:deploy` (and the `/vskit:ship` orchestrator that calls it) is the only place a **logged waiver** can be created. On a soft-block:
 
 ```
 2 features below ship gate (composite < 8 on demo-counter; e2e gap on signup).
@@ -467,7 +269,7 @@ Deploy anyway? [y/N]: y
 Waiver reason: marketing demo deadline; signup e2e blocked on staging env
 ```
 
-If the operator types `y`, `/vskit:deploy` appends a row to **each failing feature's `SCORE.md ## Score History`** capturing date, deployer, failing dimensions, composite at deploy, and the free-text reason. Bypasses are auditable. Silent bypasses are not possible (the pre-push hook calls `/vskit:check deploy` and exits non-zero on hard-block).
+If accepted, `/vskit:deploy` appends a row to **each failing feature's `SCORE.md ## Score History`** with date, deployer, failing dimensions, composite at deploy, and reason. Bypasses are auditable. Silent bypasses are impossible — the pre-push hook calls `/vskit:check deploy` and exits non-zero on hard-block.
 
 ---
 
@@ -496,14 +298,11 @@ Each has a copy-paste skeleton in [`templates/`](./templates/). The [worked exam
 
 **What it captures.** Problem statement (§1), in/out scope (§2), independently-verifiable acceptance criteria (§3), NFRs (§4 — latency, error budget, auth, quotas, accessibility, security), test specification (§7), open questions (§9), implementation notes (§10).
 
-**Why this produces solid specs.**
-
 - **ACs must be independently verifiable.** Documentation score (§7.2 Dim 1) drops for vague ACs like "user can log in." Only sharp ACs like `AC-04: POST /click enforces 60 req/min/IP; the 61st returns 429` clear the floor. The format *forces* sharpness.
 - **`Applies:` is an honest scope declaration.** A backend-only feature declares `[dbschema, interface-contracts]`; a CLI library declares `[]`. The scorer only audits what's declared — no penalizing a CLI lib for missing HTTP contracts.
-- **`Touches:` is the cache key.** `/vskit:score` uses it to decide what to re-score. Keeps scoring fast without hiding stale code.
-- **`Status` is removed by design.** Lifecycle is *computed* from observable state (TASKS row statuses + score values + score history). No one can fake "we're 80% done" — the files tell the truth.
+- **`Touches:` is the cache key.** `/vskit:score` uses it to decide what to re-score. Plus `Status` is *computed* from observable state (TASKS rows + score values + score history) — never hand-edited, so no one can fake "we're 80% done."
 
-**Example excerpt** (from [`example/features/demo-counter/SPEC.md`](./example/features/demo-counter/SPEC.md)):
+**Example excerpt** ([`example/features/demo-counter/SPEC.md`](./example/features/demo-counter/SPEC.md)):
 
 ```markdown
 **Applies:** [dbschema, interface-contracts, clauses]
@@ -524,13 +323,11 @@ Each has a copy-paste skeleton in [`templates/`](./templates/). The [worked exam
 
 **What it captures.** Implementation tasks derived from SPEC §3 ACs. Columns: ID, description, owner, priority, status, linked ACs, source decision ID.
 
-**Why this produces solid specs.**
-
 - **Every task has `Linked ACs`.** No work happens that doesn't trace to a requirement. The `/vskit:audit-traceability` command later refuses to merge commits that don't cite an AC.
 - **`Decision: D-NN` column splits design-driven vs. baseline work.** A task that exists because of a /critique decision carries the decision ID. Tasks that just satisfy an AC have `—`. The split tells reviewers which work is opinion-shaped.
 - **Status is the only hand-edited lifecycle signal.** Everything else is computed. The four valid states (`Pending → In Progress → In Review → Done`) are deliberate — fewer states means fewer lies.
 
-**Example excerpt** (from [`example/features/demo-counter/TASKS.md`](./example/features/demo-counter/TASKS.md)):
+**Example excerpt** ([`example/features/demo-counter/TASKS.md`](./example/features/demo-counter/TASKS.md)):
 
 ```markdown
 | ID | Description | Owner | Priority | Status | Linked ACs | Decision |
@@ -546,13 +343,11 @@ Each has a copy-paste skeleton in [`templates/`](./templates/). The [worked exam
 
 **What it captures.** Every design decision: who raised it, the question, the decision, the rationale, which canonical file got updated (the propagation contract), any superseded prior decision. Unresolved items move to `## Deferred Items` (DEF-NN).
 
-**Why this produces solid specs.**
-
 - **The propagation contract forbids orphan rows.** Every decision must cite the canonical file it caused to change (`SPEC §3 AC-04`, `DBSCHEMA users.deleted_at`, etc.). An orphan row is a Documentation defect — caught by `/vskit:score` Dim 1.
 - **Unresolved decisions become `DEF-NN`, not silent drops.** Per INV-3 (fail loud): a decision that didn't land in a canonical file but won't be acted on right now still gets a row, with `Why deferred` and `Revisit when` filled.
 - **History is append-only.** Superseded decisions get a `Supersedes: D-NN` link to the replacement; they don't disappear. Six months later, "why does this code check IP again?" answers itself: `git log --grep='Decision: D-04'` → DECISIONS.md D-04 → rationale + alternatives considered + who raised it.
 
-**Example excerpt** (from [`example/features/demo-counter/DECISIONS.md`](./example/features/demo-counter/DECISIONS.md)):
+**Example excerpt** ([`example/features/demo-counter/DECISIONS.md`](./example/features/demo-counter/DECISIONS.md)):
 
 ```markdown
 | ID | Date | Raised by | Question | Decision | Rationale | Updates |
@@ -567,14 +362,11 @@ Each has a copy-paste skeleton in [`templates/`](./templates/). The [worked exam
 
 **What it captures.** 8 quality dimensions scored 0–10 (Documentation, Test Coverage, Module Clarity, Requirements Coverage, Logging, Error Handling, Security, NFR Compliance), composite, ship-gate status, drift findings, score history, improvement actions.
 
-**Why this produces solid specs.**
-
 - **Eight INDEPENDENT scorers — no averaging away weakness.** The composite (mean) is informational; the ship gate enforces *every dim ≥ 7* and *security ≥ 8* separately. A Security 5 cannot hide behind a Documentation 9.
 - **Each dimension has a named owner.** security-specialist scores Security, devops-lead scores Logging, etc. The Stop hook records which subagent ran. When a score drops, you know who to ask.
-- **Drift Findings list code-vs-spec mismatches by file:line.** Six months later, the score file *is* the audit. No "we'll figure out where the bug is" — the line number is right there.
-- **Score History shows trajectory.** A composite that climbs `2.1 → 5.8 → 7.4 → 8.5` across one feature tells you which sessions moved the needle and which were friction.
+- **Drift Findings list code-vs-spec mismatches by file:line.** Six months later, the score file *is* the audit. The line number is right there. Score History shows the composite trajectory across sessions.
 
-**Example excerpt** (from [`example/features/demo-counter/SCORE.md`](./example/features/demo-counter/SCORE.md)):
+**Example excerpt** ([`example/features/demo-counter/SCORE.md`](./example/features/demo-counter/SCORE.md)):
 
 ```markdown
 | Dimension | Score | Scorer | Notes |
@@ -598,12 +390,10 @@ Each has a copy-paste skeleton in [`templates/`](./templates/). The [worked exam
 
 **What it captures.** Tables, columns, constraints, indexes, plus migrations (each with Up steps, Down/rollback steps, and a back-compat assertion).
 
-**Why this produces solid specs.**
-
 - **Migrations force Up + Down + back-compat.** Three fields are mandatory; missing any is a Dim 7 (Security) defect because migration risk lives there. A one-way migration must explicitly justify the absence of a rollback — silent omission is forbidden.
 - **Back-compat assertion is a paragraph, not a checkbox.** It names which old code paths continue to work between the Up and the corresponding code release. If no back-compat window is needed (coordinated single-deploy), the spec demands you say so explicitly with rationale.
 
-**Example excerpt** (from [`example/features/demo-counter/DBSCHEMA.md`](./example/features/demo-counter/DBSCHEMA.md)):
+**Example excerpt** ([`example/features/demo-counter/DBSCHEMA.md`](./example/features/demo-counter/DBSCHEMA.md)):
 
 ```markdown
 ### M-01 — 2026-05-20 — Create `clicks` table
@@ -632,8 +422,6 @@ No coordinated deploy window required.
 
 **What it captures.** Endpoint contracts: request shape (body, query, path params), validation rules, response codes and bodies, auth model, rate limits, logging contract.
 
-**Why this produces solid specs.**
-
 - **Auth model declared explicitly per endpoint.** Public endpoints say "Auth: None — public endpoint by design (DECISIONS D-05)" — never silently assumed. If a security incident asks "why was this open?", the SPEC has the answer with the decision ID.
 - **Validation rules trace to ACs and DECISIONS.** AC-03 says "campaign ≤ 64 chars." Decision D-02 says "NFC-normalize first." Both appear in the endpoint's validation section. The contract is the canonical place — code reviewers can grep for the rule before the type system catches it.
 - **Logging contract is part of the endpoint, not an afterthought.** Every endpoint specifies what's logged (`campaign`, `status`, `duration_ms`) and what's NEVER logged (client IP, user-agent). Pairs with Dim 5 (Logging) scoring.
@@ -644,14 +432,11 @@ No coordinated deploy window required.
 
 **What it captures.** Invariant rules graded by AI: severity (Low/Medium/High/Critical), last spec check + last code check verdicts (PASS/FAIL/INDETERMINATE), confidence 0–100%, top-5 enforcement files, reasoning paragraphs, removed/superseded log.
 
-**Why this produces solid specs.**
-
 - **Clauses fill the gap ACs and NFRs can't.** ACs test behavior on one request. NFRs measure aggregate properties. Clauses assert invariants that must hold *across the codebase*: "no PII in logs anywhere," "every write is audited," "no protected route without auth middleware." Things you can't express in one unit test.
 - **Verdicts come with confidence percentages.** A 100% confidence verdict is rare and suspect — typical PASS lands 80–95%, typical FAIL 70–90%. Below 60% escalates to INDETERMINATE per INV-3 (don't present soft answers as hard ones).
-- **Top-5 enforcement files is the audit trail.** When a clause flips from PASS to FAIL, the AI names exactly which files lost the property and why. Reviewers can go straight to the regression.
-- **Stale clauses count as INDETERMINATE.** A clause whose last code-check is older than 14 days fails the ship gate at Medium severity or higher. Forces periodic re-checking without becoming nuisance for low-severity rules.
+- **Top-5 enforcement files is the audit trail.** When a clause flips from PASS to FAIL, the AI names which files lost the property and why. Reviewers go straight to the regression. Stale clauses (>14 days unchecked) auto-flip to INDETERMINATE and gate ship at Medium+ severity.
 
-**Example excerpt** (from [`example/features/demo-counter/CLAUSES.md`](./example/features/demo-counter/CLAUSES.md)):
+**Example excerpt** ([`example/features/demo-counter/CLAUSES.md`](./example/features/demo-counter/CLAUSES.md)):
 
 ```markdown
 ### CLA-01 — Client IP addresses must never appear in log lines
@@ -674,8 +459,6 @@ No coordinated deploy window required.
 ### `prototypes/` — UX mockups (when `Applies: prototype`)
 
 **What it captures.** UX prototype HTML (`index.html` + assets/) for stakeholder review before code. Served behind basic-auth at `/prototypes/` per spec §6.
-
-**Why this produces solid specs.**
 
 - **A prototype is approval-gated before implementation.** A feature with `Prototype: required` cannot move from `Spec Ready` to `In Development` until `Prototype: approved` is set in SPEC frontmatter. The UX specialist signs off.
 - **Basic-auth keeps non-prod mockups out of search engines.** Credentials live in the host's secrets store, never in the repo.
