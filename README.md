@@ -1,14 +1,31 @@
 # vertical-slices-md-dev-kit
 
-**AI framework to build solid software apps — PRDs, per-feature markdown specs (vertical slices), contract clauses, and ship gates.**
+**Your AI writes code that drifts from the spec. This makes the drift impossible to merge.**
 
-Adopt it in under an hour and your AI-generated code starts shipping behind quality gates that `git` + `make` + `pytest` don't enforce on their own. The methodology itself is documented in [`vertical-slices-ai-framework.md`](./vertical-slices-ai-framework.md) (v2.0) — the normative spec. This bundle wraps that spec with templates, reference scripts, and a worked example so a stranger can adopt it without reading 1027 lines first.
+A markdown-based quality gate for AI-assisted repos: every commit traces back to an acceptance criterion, every decision lands in a rationale journal, and the repo refuses to ship when the chain breaks. PRDs, per-feature SPECs (vertical slices), contract clauses, and a ship gate — all files, no SaaS.
 
 > **Bundle version:** 2.0 · **License:** MIT · **Status:** Active
 >
 > **v2.0 changes:** All commands renamed to verb-first form and prefixed `vskit:` to avoid skill collisions. Twelve commands renamed, three deleted. See [`CHANGELOG.md`](./CHANGELOG.md) for the full old→new migration table.
 >
 > **v1.8 highlight (still active):** Clauses — invariant rules graded by AI with confidence + reasoning, per feature. See [§4.7 in the spec](./vertical-slices-ai-framework.md#47-clauses--invariant-rules-with-confidence-graded-checks) or the demo at [`example/features/demo-counter/CLAUSES.md`](./example/features/demo-counter/CLAUSES.md).
+
+---
+
+## Who this is for
+
+You're a **solo dev or staff engineer** running an AI-assisted greenfield repo (or a small one). You ship a lot of code that Claude / Codex / Cursor / Aider helped write. You can feel that the spec lives in your head and the AI's output drifts from it slowly. You want guardrails that *don't* require a 10-person process team to maintain.
+
+This bundle gives you four things that `git` + `make` + `pytest` do not:
+
+1. **Intent declared before code.** Every commit names which PRD/SPEC acceptance criterion it satisfies.
+2. **Quality measured per change, not per release.** Up to 8 named dimensions scored 0–10. Refuses to ship below floor.
+3. **Overhead measured per repo.** The bundle records its own cost and forces a drop decision when it stops paying for itself.
+4. **Decisions traceable from rationale to commit.** DECISIONS.md → SPEC.md → TASKS.md → commit trailer → audit. Every merged line walks back to the question that motivated it.
+
+The full case is in [`vertical-slices-ai-framework.md`](./vertical-slices-ai-framework.md) §0.1.
+
+The methodology itself is documented in [`vertical-slices-ai-framework.md`](./vertical-slices-ai-framework.md) (v2.0) — the normative spec. This bundle wraps that spec with templates, reference scripts, and a worked example so a stranger can adopt it without reading 1027 lines first.
 
 ---
 
@@ -453,19 +470,6 @@ Waiver reason: marketing demo deadline; signup e2e blocked on staging env
 If the operator types `y`, `/vskit:deploy` appends a row to **each failing feature's `SCORE.md ## Score History`** capturing date, deployer, failing dimensions, composite at deploy, and the free-text reason. Bypasses are auditable. Silent bypasses are not possible (the pre-push hook calls `/vskit:check deploy` and exits non-zero on hard-block).
 
 ---
-
-## Who this is for
-
-You're a **solo dev or staff engineer** running an AI-assisted greenfield repo (or a small one). You ship a lot of code that Claude / Codex / Cursor / Aider helped write. You can feel that the spec lives in your head and the AI's output drifts from it slowly. You want guardrails that *don't* require a 10-person process team to maintain.
-
-This bundle gives you four things that `git` + `make` + `pytest` do not:
-
-1. **Intent declared before code.** Every commit names which PRD/SPEC acceptance criterion it satisfies.
-2. **Quality measured per change, not per release.** Up to 8 named dimensions scored 0–10. Refuses to ship below floor.
-3. **Overhead measured per repo.** The bundle records its own cost and forces a drop decision when it stops paying for itself.
-4. **Decisions traceable from rationale to commit.** DECISIONS.md → SPEC.md → TASKS.md → commit trailer → audit. Every merged line walks back to the question that motivated it.
-
-The full case is in [`vertical-slices-ai-framework.md`](./vertical-slices-ai-framework.md) §0.1.
 
 ## Per-feature anatomy — and why it produces solid specs
 
