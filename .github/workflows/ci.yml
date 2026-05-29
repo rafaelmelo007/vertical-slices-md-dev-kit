@@ -27,9 +27,11 @@ jobs:
           mkdir /tmp/test-repo
           cd /tmp/test-repo
           echo "n" | node $GITHUB_WORKSPACE/bin/vskit.js init
-          test -f docs/bundle/vertical-slices-ai-framework.md
+          test -f .claude/vskit.md
+          test -f .claude/worklog-stop-hook.sh
           test -f .claude/settings.json
           test -f CLAUDE.md
+          grep -q '@.claude/vskit.md' CLAUDE.md
           test -d docs/features
           test -d docs/worklog
           echo "✅ init output verified"

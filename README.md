@@ -37,7 +37,13 @@ The methodology itself is documented in [`vertical-slices-ai-framework.md`](./ve
 npx vskit init
 ```
 
-That's it. Run it from your repo root. It copies the framework into `docs/bundle/`, scaffolds the `docs/` tree, installs the Stop hook into `.claude/settings.json`, and patches your `CLAUDE.md` — all in under 10 seconds.
+That's it. Run from your repo root. After that, open Claude Code — all `/vskit:*` commands are immediately available. No second step, no bundle to manage.
+
+What it does:
+- Installs the full command set → `.claude/vskit.md`
+- Wires it into `CLAUDE.md` with one `@` reference
+- Installs the Stop hook (auto-writes `docs/worklog/` after each turn)
+- Scaffolds the `docs/` tree (features/, prds/, worklog/, incidents/, …)
 
 **Requirements:** Node 18+, bash, jq (for the Stop hook).
 
