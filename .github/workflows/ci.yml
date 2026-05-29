@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: CLI smoke test — version
+        run: node bin/vskit.js --version
+
+      - name: CLI smoke test — help
+        run: node bin/vskit.js --help
+
+      - name: CLI smoke test — init in temp dir
+        run: |
+          mkdir /tmp/test-repo
+          cd /tmp/test-repo
+          echo "n" | node $GITHUB_WORKSPACE/bin/vskit.js init
+          test -f docs/bundle/vertical-slices-ai-framework.md
+          test -f .claude/settings.json
+          test -f CLAUDE.md
+          test -d docs/features
+          test -d docs/worklog
+          echo "✅ init output verified"
+
+      - name: CLI smoke test — add-feature
+        run: |
+          cd /tmp/test-repo
+          node $GITHUB_WORKSPACE/bin/vskit.js add-feature user-auth
+          test -f docs/features/user-auth/SPEC.md
+          test -f docs/features/user-auth/TASKS.md
+          echo "✅ add-feature output verified"

@@ -1,0 +1,39 @@
+{
+  "name": "vskit",
+  "version": "2.0.0",
+  "description": "AI quality gate for spec-first repos: traces every commit to an acceptance criterion, scores 8 quality dimensions, and refuses to ship when the chain breaks.",
+  "keywords": [
+    "ai",
+    "spec",
+    "vertical-slices",
+    "quality-gate",
+    "claude",
+    "acceptance-criteria",
+    "prd"
+  ],
+  "homepage": "https://github.com/rafaelmelo007/vertical-slices-md-dev-kit#readme",
+  "bugs": {
+    "url": "https://github.com/rafaelmelo007/vertical-slices-md-dev-kit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rafaelmelo007/vertical-slices-md-dev-kit.git"
+  },
+  "license": "MIT",
+  "author": "rafaelmelo007",
+  "bin": {
+    "vskit": "bin/vskit.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "scripts/",
+    "templates/",
+    "vertical-slices-ai-framework.md",
+    "ADOPTION.md",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  }
+}

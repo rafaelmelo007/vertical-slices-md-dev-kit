@@ -33,9 +33,18 @@ The methodology itself is documented in [`vertical-slices-ai-framework.md`](./ve
 
 ### Install
 
-**The kit is markdown + a few shell scripts.** No installer to run, no package to publish. Drop it into your repo via your AI assistant or via `degit`.
+```bash
+npx vskit init
+```
 
-#### Recommended: clone the kit, ask your AI to apply it
+That's it. Run it from your repo root. It copies the framework into `docs/bundle/`, scaffolds the `docs/` tree, installs the Stop hook into `.claude/settings.json`, and patches your `CLAUDE.md` — all in under 10 seconds.
+
+**Requirements:** Node 18+, bash, jq (for the Stop hook).
+
+<details>
+<summary><strong>Other install methods</strong></summary>
+
+#### Ask your AI to apply it (no Node required)
 
 ```bash
 # Clone once, anywhere on disk
@@ -46,17 +55,13 @@ Then in your target repo, with Claude Code (or Cursor / Aider / any AI assistant
 
 > Apply the vertical-slices-md-dev-kit bundle from `~/vskit` to this repo, following its `ADOPTION.md` guide. Stop and ask before any destructive change.
 
-Your AI will: copy the bundle into `docs/bundle/`, install the Stop hook into `.claude/settings.json`, scaffold the `docs/` tree, paste the snippet into `CLAUDE.md`, and pause if anything in your repo would be overwritten. Total time: ~1 minute.
-
-#### Alternative: copy without AI (`degit`)
+#### Copy without AI (`degit`)
 
 ```bash
 npx degit rafaelmelo007/vertical-slices-md-dev-kit docs/bundle
 ```
 
 Then follow `docs/bundle/ADOPTION.md` for the Stop hook + doc tree + CLAUDE.md steps (~5 minutes of mechanical work).
-
-Full walkthrough → [`ADOPTION.md`](./ADOPTION.md)
 
 <details>
 <summary><strong>Other ways to vendor the kit</strong></summary>
@@ -70,6 +75,8 @@ git clone --depth 1 https://github.com/rafaelmelo007/vertical-slices-md-dev-kit.
   && cp -r /tmp/vskit/. docs/bundle/ \
   && rm -rf docs/bundle/.git
 ```
+
+Full walkthrough → [`ADOPTION.md`](./ADOPTION.md)
 
 </details>
 
