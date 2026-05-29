@@ -4,7 +4,7 @@
 
 A markdown-based quality gate for AI-assisted repos: every commit traces back to an acceptance criterion, every decision lands in a rationale journal, and the repo refuses to ship when the chain breaks. PRDs, per-feature SPECs (vertical slices), contract clauses, and a ship gate — all files, no SaaS.
 
-> **Bundle version:** 2.0 · **License:** MIT · **Status:** Active
+> **Version:** 2.0 · **License:** MIT · **Status:** Active
 >
 > **v2.0 changes:** All commands renamed to verb-first form and prefixed `vskit:` to avoid skill collisions. Twelve commands renamed, three deleted. See [`CHANGELOG.md`](./CHANGELOG.md) for the full old→new migration table.
 >
@@ -16,16 +16,16 @@ A markdown-based quality gate for AI-assisted repos: every commit traces back to
 
 You're a **solo dev or staff engineer** running an AI-assisted greenfield repo (or a small one). You ship a lot of code that Claude / Codex / Cursor / Aider helped write. You can feel that the spec lives in your head and the AI's output drifts from it slowly. You want guardrails that *don't* require a 10-person process team to maintain.
 
-This bundle gives you four things that `git` + `make` + `pytest` do not:
+It gives you four things that `git` + `make` + `pytest` do not:
 
 1. **Intent declared before code.** Every commit names which PRD/SPEC acceptance criterion it satisfies.
 2. **Quality measured per change, not per release.** Up to 8 named dimensions scored 0–10. Refuses to ship below floor.
-3. **Overhead measured per repo.** The bundle records its own cost and forces a drop decision when it stops paying for itself.
+3. **Overhead measured per repo.** The framework records its own cost and forces a drop decision when it stops paying for itself.
 4. **Decisions traceable from rationale to commit.** DECISIONS.md → SPEC.md → TASKS.md → commit trailer → audit. Every merged line walks back to the question that motivated it.
 
 The full case is in [`vertical-slices-ai-framework.md`](./vertical-slices-ai-framework.md) §0.1.
 
-The methodology itself is documented in [`vertical-slices-ai-framework.md`](./vertical-slices-ai-framework.md) (v2.0) — the normative spec. This bundle wraps that spec with templates, reference scripts, and a worked example so a stranger can adopt it without reading 1027 lines first.
+The methodology is documented in [`vertical-slices-ai-framework.md`](./vertical-slices-ai-framework.md) (v2.0) — the normative spec. The CLI installs it with templates, reference scripts, and a worked example so you can adopt without reading 1027 lines first.
 
 ---
 
@@ -34,7 +34,7 @@ The methodology itself is documented in [`vertical-slices-ai-framework.md`](./ve
 ### Install
 
 ```bash
-npx vskit init
+npx @rafaelmelo007/vskit init
 ```
 
 That's it. Run from your repo root. After that, open Claude Code — all `/vskit:*` commands are immediately available. No second step, no bundle to manage.
@@ -55,7 +55,7 @@ Every command is target-aware (`<slug>`, `<prd-path>`) and writes specific artif
 
 | Command | Purpose | Writes? |
 |---|---|---|
-| `npx vskit init` | Install framework commands, Stop hook, and scaffold docs/ — run once from the repo root | yes — `.claude/vskit.md`, `.claude/settings.json`, `docs/` tree |
+| `npx @rafaelmelo007/vskit init` | Install framework commands, Stop hook, and scaffold docs/ — run once from the repo root | yes — `.claude/vskit.md`, `.claude/settings.json`, `docs/` tree |
 | `/vskit:init-prototypes` | Sub-init when a feature adds `prototype` to Applies (creates htpasswd + nginx snippet) | yes — htpasswd |
 
 #### PRD phase
@@ -459,8 +459,8 @@ vertical-slices-md-dev-kit/
 ├── bin/
 │   └── vskit.js                       ← CLI entry point
 ├── lib/
-│   ├── init.js                        ← npx vskit init
-│   ├── add-feature.js                 ← npx vskit add-feature
+│   ├── init.js                        ← npx @rafaelmelo007/vskit init
+│   ├── add-feature.js                 ← npx @rafaelmelo007/vskit add-feature
 │   └── version.js
 ├── vertical-slices-ai-framework.md    ← the spec (normative); installed to .claude/vskit.md
 ├── scripts/
@@ -482,17 +482,17 @@ vertical-slices-md-dev-kit/
 
 ## What "ready to adopt" means
 
-You can pick this bundle up if:
+You can adopt this if:
 
 - You write code with AI assistants and you have a `CLAUDE.md` (or equivalent) in the repo today.
 - You ship to one repo, not a portfolio. Cross-repo governance is out of scope (spec §1).
-- You're willing to hand-edit markdown. The bundle is not a SaaS — it's a methodology + a few shell scripts.
+- You're willing to hand-edit markdown. It is not a SaaS — it's a methodology + a few shell scripts.
 
 You should not adopt this bundle if:
 
 - You need a hosted dashboard. The framework is file-based by design (INV-1: single source of truth).
 - You're shipping a portfolio of microservices that need shared schemas. The spec is explicit about being per-repo.
-- You're allergic to the discipline of writing acceptance criteria before writing code. The bundle does not work without that step.
+- You're allergic to the discipline of writing acceptance criteria before writing code. It does not work without that step.
 
 ## How vertical-slices-md-dev-kit is different from…
 

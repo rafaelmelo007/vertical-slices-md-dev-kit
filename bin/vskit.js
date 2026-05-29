@@ -36,9 +36,9 @@ function printHelp() {
 vskit — vertical-slices-md-dev-kit CLI
 
 Usage:
-  npx vskit init             Bootstrap the framework in the current repo
-  npx vskit add-feature      Scaffold a new feature slice
-  npx vskit version          Show the installed version
+  npx @rafaelmelo007/vskit init             Bootstrap the framework in the current repo
+  npx @rafaelmelo007/vskit add-feature      Scaffold a new feature slice
+  npx @rafaelmelo007/vskit version          Show the installed version
 
 Options:
   -h, --help     Show this help
