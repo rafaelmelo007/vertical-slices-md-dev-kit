@@ -1,4 +1,4 @@
-**Task:** Add a new invariant clause to `docs/features/<slug>/CLAUSES.md`.
+**Task:** Add a new invariant rule to `docs/features/<slug>/RULES.md`.
 
 **Input:** `<slug> "<rule>" [--severity=low|medium|high|critical]`
 - `<slug>` — feature folder name under `docs/features/`
@@ -12,43 +12,43 @@
 - Rule must be a complete sentence (non-empty string). Fail if empty.
 - Severity must be one of: `Low`, `Medium`, `High`, `Critical` (case-insensitive). Fail if invalid.
 
-**2. Ensure CLAUSES.md exists:**
-If `docs/features/<slug>/CLAUSES.md` does not exist, create it with headers:
+**2. Ensure RULES.md exists:**
+If `docs/features/<slug>/RULES.md` does not exist, create it with headers:
 ```markdown
-# Clauses — <Feature Name>
+# Rules — <Feature Name>
 **Feature:** <slug>
 
-## Active Clauses
+## Active Rules
 
 | ID | Rule | Severity | Added | Last Spec Check | Last Code Check | Top 5 Enforcement Files |
 |----|------|----------|-------|-----------------|-----------------|------------------------|
 
-## Removed / Superseded Clauses
+## Removed / Superseded Rules
 
 | ID | Rule | Severity | Added | Removed | Reason | Final Verdict | Supersedes |
 |----|------|----------|-------|---------|--------|---------------|------------|
 ```
 
-**3. Ensure `clauses` in SPEC Applies:**
-Read SPEC.md `Applies:` field. If `clauses` is not listed, add it.
+**3. Ensure `rules` in SPEC Applies:**
+Read SPEC.md `Applies:` field. If `rules` is not listed, add it.
 
-**4. Assign next CLA-NN ID:**
-Read existing active clauses to find the highest N. New ID = next N.
+**4. Assign next RUL-NN ID:**
+Read existing active rules to find the highest N. New ID = next N.
 
-**5. Append new row to `## Active Clauses` table:**
+**5. Append new row to `## Active Rules` table:**
 ```
-| CLA-NN | <rule> | <Severity> | <YYYY-MM-DD> | pending | pending | pending |
+| RUL-NN | <rule> | <Severity> | <YYYY-MM-DD> | pending | pending | pending |
 ```
 
 **6. Run baseline check:**
-Immediately run `/vskit:clause check <slug> CLA-NN` to record an initial verdict before exiting.
+Immediately run `/vskit:rule check <slug> RUL-NN` to record an initial verdict before exiting.
 
 **Print after completion:**
 ```
-Added: CLA-NN — "<rule>" [<Severity>]
-CLAUSES.md: docs/features/<slug>/CLAUSES.md
-Applies: updated to include clauses
+Added: RUL-NN — "<rule>" [<Severity>]
+RULES.md: docs/features/<slug>/RULES.md
+Applies: updated to include rules
 Baseline check: <PASS|FAIL|INDETERMINATE> @ <confidence>%
 ```
 
-**Writes:** `CLAUSES.md` new row + SPEC.md `Applies:` field update (if needed).
+**Writes:** `RULES.md` new row + SPEC.md `Applies:` field update (if needed).

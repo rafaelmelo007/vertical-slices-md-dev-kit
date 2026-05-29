@@ -31,8 +31,8 @@ Dimensions that do not apply → write `N/A — <reason>` in SCORE.md and exclud
 - 0–4: critical fail
 
 **Ship gate floors:**
-- Hard block: Security < 8, any TASKS not Done, `last_scored_sha` missing/stale, any DECISIONS orphan row, upstream blocker not Shipped, any High/Critical clause FAIL ≥ 80% confidence.
-- Soft block: composite < 8.0, any non-security scored dim < 7, e2e gap, clause FAIL 60–79%.
+- Hard block: Security < 8, any TASKS not Done, `last_scored_sha` missing/stale, any DECISIONS orphan row, upstream blocker not Shipped, any High/Critical rule FAIL ≥ 80% confidence.
+- Soft block: composite < 8.0, any non-security scored dim < 7, e2e gap, rule FAIL 60–79%.
 
 **SCORE.md updates (write all of the following):**
 1. `## Scores` table — all 8 rows (score or N/A, scorer, notes with evidence).

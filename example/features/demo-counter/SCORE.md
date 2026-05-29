@@ -20,13 +20,13 @@
 **Composite formula:** arithmetic mean of the **scored** dimensions (any dimension marked `N/A` per §7.1 is excluded from both numerator and denominator; Security is never N/A as of v1.7), rounded to 1 decimal place. The "no scored dimension < 7" floor and "security ≥ 8" rule are evaluated **independently** of the composite — a high mean cannot mask a weak dimension.
 **Ship gate:** every scored dimension ≥ 7 · composite ≥ 8.0 · security ≥ 8 (see §10.3 for hard-block vs soft-block tiers)
 
-> **Gate status: HARD BLOCK (v1.8).** Composite 7.4 < 8.0 (soft); Logging (5) and Test Coverage (6) and NFR (6) below 7 floor (soft); Security at 8 (clears independent floor). **Plus:** CLAUSES.md `CLA-01` (High severity) is FAIL with 92% confidence — that's a hard block under §10.3 v1.8. CLA-03 is stale (>14 days) which adds a soft block. Fix CLA-01 (delete `handler.rs:42` peer_addr log) to clear the hard floor, then re-score to drop the soft block.
+> **Gate status: HARD BLOCK (v1.8).** Composite 7.4 < 8.0 (soft); Logging (5) and Test Coverage (6) and NFR (6) below 7 floor (soft); Security at 8 (clears independent floor). **Plus:** RULES.md `RUL-01` (High severity) is FAIL with 92% confidence — that's a hard block under §10.3 v1.8. RUL-03 is stale (>14 days) which adds a soft block. Fix RUL-01 (delete `handler.rs:42` peer_addr log) to clear the hard floor, then re-score to drop the soft block.
 
 ## Drift Findings
 
 - AC-07: `server/click/handler.rs:42` logs full request including `req.peer_addr()`. Violates D-03. Filed as part of T-06.
-- **CLA-01:** same root cause as AC-07. Will clear when ACTION-04 lands.
-- **CLA-03:** stale clause (last code-check 2026-05-08). Run `/vskit:clause check demo-counter CLA-03` to refresh.
+- **RUL-01:** same root cause as AC-07. Will clear when ACTION-04 lands.
+- **RUL-03:** stale clause (last code-check 2026-05-08). Run `/vskit:clause check demo-counter RUL-03` to refresh.
 
 ## Score History
 

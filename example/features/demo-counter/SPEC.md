@@ -2,7 +2,7 @@
 
 **Status:** *computed by /vskit:project-status — do not hand-edit (INV-2)*
 **Priority:** Medium
-**Applies:** [dbschema, interface-contracts, clauses]
+**Applies:** [dbschema, interface-contracts, rules]
 **Touches:** [`server/click/**`, `server/db/migrations/202*_clicks.sql`]
 **Prototype:** N/A
 **Agents:** backend-lead, db-architect, security-specialist, testing-lead
@@ -78,7 +78,7 @@ Marketing wants to embed a one-pixel tracking link in outbound emails and know h
 - **DB Schema:** [DBSCHEMA.md](./DBSCHEMA.md)
 - **Interface Contracts:** [INTERFACE-CONTRACTS.md](./INTERFACE-CONTRACTS.md)
 - **Tasks:** [TASKS.md](./TASKS.md)
-- **Clauses:** [CLAUSES.md](./CLAUSES.md)  *(3 active; CLA-01 currently FAIL — see ship-gate impact)*
+- **Rules:** [RULES.md](./RULES.md)  *(3 active; RUL-01 currently FAIL — see ship-gate impact)*
 - **Blocked-by:** []
 
 ## §9 Open Questions

@@ -2,13 +2,13 @@
 
 **Your AI writes code that drifts from the spec. This makes the drift impossible to merge.**
 
-A markdown-based quality gate for AI-assisted repos: every commit traces back to an acceptance criterion, every decision lands in a rationale journal, and the repo refuses to ship when the chain breaks. PRDs, per-feature SPECs (vertical slices), contract clauses, and a ship gate — all files, no SaaS.
+A markdown-based quality gate for AI-assisted repos: every commit traces back to an acceptance criterion, every decision lands in a rationale journal, and the repo refuses to ship when the chain breaks. PRDs, per-feature SPECs (vertical slices), contract rules, and a ship gate — all files, no SaaS.
 
 > **Version:** 2.0 · **License:** MIT · **Status:** Active
 >
 > **v2.0 changes:** All commands renamed to verb-first form and prefixed `vskit:` to avoid skill collisions. Twelve commands renamed, three deleted. See [`CHANGELOG.md`](./CHANGELOG.md) for the full old→new migration table.
 >
-> **v1.8 highlight (still active):** Clauses — invariant rules graded by AI with confidence + reasoning, per feature. See [§4.7 in the spec](./vertical-slices-ai-framework.md#47-clauses--invariant-rules-with-confidence-graded-checks) or the demo at [`example/features/demo-counter/CLAUSES.md`](./example/features/demo-counter/CLAUSES.md).
+> **v1.8 highlight (still active):** Rules — invariant rules graded by AI with confidence + reasoning, per feature. See [§4.7 in the spec](./vertical-slices-ai-framework.md#47-rules--invariant-rules-with-confidence-graded-checks) or the demo at [`example/features/demo-counter/RULES.md`](./example/features/demo-counter/RULES.md).
 
 ---
 
@@ -78,17 +78,17 @@ Every command is target-aware (`<slug>`, `<prd-path>`) and writes specific artif
 | `/vskit:prototype feature <slug>` | UX prototype HTML from SPEC §3 ACs | yes — `prototypes/` |
 | `/vskit:ship feature <slug>` | Orchestrator: test → score → check deploy → deploy | yes — score history row |
 
-#### Clauses (invariant rules, v1.8+)
+#### Rules (invariant rules, v1.8+)
 
 | Command | Purpose | Writes? |
 |---|---|---|
-| `/vskit:clause add <slug> "<rule>" --severity=<...>` | Append new clause + auto-baseline check | yes — CLAUSES.md row |
-| `/vskit:clause check <slug> [<id>]` | Re-evaluate clauses against current SPEC + code | yes — verdicts, confidence, top-5 files |
-| `/vskit:clause list <slug>` | List active clauses, filterable by status | no |
-| `/vskit:clause update <slug> <id> "<rule>"` | Edit rule/severity; supersedes the old row | yes |
-| `/vskit:clause remove <slug> <id>` | Move to Removed/Superseded with reason + final verdict | yes |
-| `/vskit:clause check-all` | Run check across every feature with `clauses` in Applies | yes |
-| `/vskit:clause audit` | Read-only scan for stale + failing clauses across all features | no |
+| `/vskit:rule add <slug> "<rule>" --severity=<...>` | Append new clause + auto-baseline check | yes — RULES.md row |
+| `/vskit:rule check <slug> [<id>]` | Re-evaluate rules against current SPEC + code | yes — verdicts, confidence, top-5 files |
+| `/vskit:rule list <slug>` | List active rules, filterable by status | no |
+| `/vskit:rule update <slug> <id> "<rule>"` | Edit rule/severity; supersedes the old row | yes |
+| `/vskit:rule remove <slug> <id>` | Move to Removed/Superseded with reason + final verdict | yes |
+| `/vskit:rule check-all` | Run check across every feature with `rules` in Applies | yes |
+| `/vskit:rule audit` | Read-only scan for stale + failing rules across all features | no |
 
 #### Status & navigation (read-only)
 
@@ -244,7 +244,7 @@ Every adopted feature lives in `docs/features/<slug>/`. **The point of this form
 | [`SCORE.md`](#scoremd--quantified-quality-across-8-dimensions-always) | always | 8 dimensions scored 0–10, composite, ship-gate status, drift, history |
 | [`DBSCHEMA.md`](#dbschemamd--tables-and-migrations-when-applies-dbschema) | `Applies: dbschema` | Tables, indexes, migrations with Up + Down + back-compat assertion |
 | [`INTERFACE-CONTRACTS.md`](#interface-contractsmd--http-ws-rpc-endpoints-when-applies-interface-contracts) | `Applies: interface-contracts` | Endpoint contracts: request shape, validation, responses, auth, rate limits, logging |
-| [`CLAUSES.md`](#clausesmd--ai-graded-invariant-rules-when-applies-clauses) | `Applies: clauses` | Invariant rules graded PASS/FAIL/INDETERMINATE with confidence + reasoning |
+| [`RULES.md`](#clausesmd--ai-graded-invariant-rules-when-applies-rules) | `Applies: rules` | Invariant rules graded PASS/FAIL/INDETERMINATE with confidence + reasoning |
 | [`prototypes/`](#prototypes--ux-mockups-when-applies-prototype) | `Applies: prototype` | UX prototype HTML for stakeholder review before code |
 
 Each has a copy-paste skeleton in [`templates/`](./templates/). The [worked example](./example/features/demo-counter/) ships every file populated.
@@ -262,7 +262,7 @@ Each has a copy-paste skeleton in [`templates/`](./templates/). The [worked exam
 **Example excerpt** ([`example/features/demo-counter/SPEC.md`](./example/features/demo-counter/SPEC.md)):
 
 ```markdown
-**Applies:** [dbschema, interface-contracts, clauses]
+**Applies:** [dbschema, interface-contracts, rules]
 **Touches:** [`server/click/**`, `server/db/migrations/202*_clicks.sql`]
 
 ## §3 Acceptance Criteria
@@ -385,15 +385,15 @@ No coordinated deploy window required.
 
 ---
 
-### `CLAUSES.md` — AI-graded invariant rules (when `Applies: clauses`)
+### `RULES.md` — AI-graded invariant rules (when `Applies: rules`)
 
 **What it captures.** Invariant rules graded by AI: severity (Low/Medium/High/Critical), last spec check + last code check verdicts (PASS/FAIL/INDETERMINATE), confidence 0–100%, top-5 enforcement files, reasoning paragraphs, removed/superseded log.
 
-- **Clauses fill the gap ACs and NFRs can't.** ACs test behavior on one request. NFRs measure aggregate properties. Clauses assert invariants that must hold *across the codebase*: "no PII in logs anywhere," "every write is audited," "no protected route without auth middleware." Things you can't express in one unit test.
+- **Rules fill the gap ACs and NFRs can't.** ACs test behavior on one request. NFRs measure aggregate properties. Rules assert invariants that must hold *across the codebase*: "no PII in logs anywhere," "every write is audited," "no protected route without auth middleware." Things you can't express in one unit test.
 - **Verdicts come with confidence percentages.** A 100% confidence verdict is rare and suspect — typical PASS lands 80–95%, typical FAIL 70–90%. Below 60% escalates to INDETERMINATE per INV-3 (don't present soft answers as hard ones).
-- **Top-5 enforcement files is the audit trail.** When a clause flips from PASS to FAIL, the AI names which files lost the property and why. Reviewers go straight to the regression. Stale clauses (>14 days unchecked) auto-flip to INDETERMINATE and gate ship at Medium+ severity.
+- **Top-5 enforcement files is the audit trail.** When a clause flips from PASS to FAIL, the AI names which files lost the property and why. Reviewers go straight to the regression. Stale rules (>14 days unchecked) auto-flip to INDETERMINATE and gate ship at Medium+ severity.
 
-**Example excerpt** ([`example/features/demo-counter/CLAUSES.md`](./example/features/demo-counter/CLAUSES.md)):
+**Example excerpt** ([`example/features/demo-counter/RULES.md`](./example/features/demo-counter/RULES.md)):
 
 ```markdown
 ### CLA-01 — Client IP addresses must never appear in log lines
@@ -441,7 +441,7 @@ docs/features/<slug>/
   │   code commits with Closes-AC: trailers
   │     ↓ /vskit:score feature
   ├── SCORE.md         ← 8 dims + composite + drift + history
-  └── CLAUSES.md       ← invariants (if clauses in Applies); re-checked by /vskit:clause check
+  └── RULES.md       ← invariants (if rules in Applies); re-checked by /vskit:rule check
 ```
 
 **Read order for a new feature:** SPEC → DECISIONS → CLAUSES (if any) → TASKS → SCORE. The first three are *what the feature is*; the last two are *how it gets built and graded*.
@@ -470,10 +470,10 @@ vertical-slices-md-dev-kit/
 │   ├── SPEC.md                        ← §4.3 SPEC template
 │   ├── TASKS.md                       ← §4.4 tasks template
 │   ├── DECISIONS.md                   ← §4.5 decisions template
-│   ├── CLAUSES.md                     ← §4.7 clauses template (v1.8)
+│   ├── RULES.md                     ← §4.7 rules template (v1.8)
 │   └── SCORE.md                       ← §7.3 score template
 ├── example/
-│   └── features/demo-counter/         ← one fully-populated feature folder (incl. CLAUSES.md)
+│   └── features/demo-counter/         ← one fully-populated feature folder (incl. RULES.md)
 └── case-studies/
     ├── README.md                      ← what counts as a case study
     ├── 01-self-adoption.md            ← the kit scores its own market-readiness

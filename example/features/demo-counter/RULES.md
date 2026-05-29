@@ -1,15 +1,15 @@
-# Clauses — Click Counter
+# Rules — Click Counter
 
 **Feature:** demo-counter
 **Source:** /vskit:clause add | /vskit:clause check
 **Last updated:** 2026-05-23
 
-> Clauses are invariant rules the feature must hold across the codebase (§4.7).
-> Three are active. CLA-01 is currently FAIL — see Drift Findings in SCORE.md.
+> Rules are invariant rules the feature must hold across the codebase (§4.7).
+> Three are active. RUL-01 is currently FAIL — see Drift Findings in SCORE.md.
 
-## Active Clauses
+## Active Rules
 
-### CLA-01 — Client IP addresses must never appear in log lines
+### RUL-01 — Client IP addresses must never appear in log lines
 
 | Field | Value |
 |---|---|
@@ -53,7 +53,7 @@ stricter reading of the clause might require spec tightening in a future revisio
 
 ---
 
-### CLA-02 — All campaign strings must be NFC-normalized before any database write
+### RUL-02 — All campaign strings must be NFC-normalized before any database write
 
 | Field | Value |
 |---|---|
@@ -91,7 +91,7 @@ is fully anchored.
 
 ---
 
-### CLA-03 — Migration M-01 must be idempotent (re-running must be a no-op)
+### RUL-03 — Migration M-01 must be idempotent (re-running must be a no-op)
 
 | Field | Value |
 |---|---|
@@ -117,7 +117,7 @@ the second invocation fails because `CREATE TABLE` is not idempotent without `IF
 EXISTS`. The clause as stated requires idempotency, so a stricter reading says FAIL.
 The 2026-05-08 check accepted that the runner's dedup is sufficient and rated PASS at
 85%. This check is now 15 days old and is **stale** per §4.7 — counts as
-INDETERMINATE for ship-gate purposes. Re-run `/vskit:clause check demo-counter CLA-03`.
+INDETERMINATE for ship-gate purposes. Re-run `/vskit:clause check demo-counter RUL-03`.
 
 **Reasoning — last spec check (stale)**
 
@@ -128,21 +128,21 @@ clause or strengthen the spec to mention idempotency explicitly.
 
 ---
 
-## Removed / Superseded Clauses
+## Removed / Superseded Rules
 
 | ID | Date | Reason | Final verdict (spec / code) | Supersedes |
 |----|------|--------|----------------------------|-------------|
-| CLA-00 | 2026-05-19 | Replaced by CLA-01 (broader: "any PII" → "client IPs"; narrower scope is testable) | INDETERMINATE 55% / FAIL 70% | — |
+| RUL-00 | 2026-05-19 | Replaced by RUL-01 (broader: "any PII" → "client IPs"; narrower scope is testable) | INDETERMINATE 55% / FAIL 70% | — |
 
 ## Current ship-gate impact
 
 | Clause | Severity | Verdict (code) | Confidence | Gate effect |
 |---|---|---|---|---|
-| CLA-01 | High | FAIL | 92% | **HARD BLOCK** (§10.3 v1.8 rule) |
-| CLA-02 | Medium | PASS | 88% | none |
-| CLA-03 | Medium | stale | — | **SOFT BLOCK** (§10.3 v1.8 stale rule) |
+| RUL-01 | High | FAIL | 92% | **HARD BLOCK** (§10.3 v1.8 rule) |
+| RUL-02 | Medium | PASS | 88% | none |
+| RUL-03 | Medium | stale | — | **SOFT BLOCK** (§10.3 v1.8 stale rule) |
 
-`/vskit:check deploy` for demo-counter will fail with exit 1 until CLA-01 is fixed (or downgraded
+`/vskit:check deploy` for demo-counter will fail with exit 1 until RUL-01 is fixed (or downgraded
 to Medium with rationale, or removed with a written reason).
 
 ## How to maintain this file
@@ -150,8 +150,8 @@ to Medium with rationale, or removed with a written reason).
 | Action | Command |
 |---|---|
 | Add a new clause | `/vskit:clause add demo-counter "<rule>" --severity=high` |
-| Re-check one clause | `/vskit:clause check demo-counter CLA-01` |
-| Re-check all clauses | `/vskit:clause check demo-counter` |
-| Edit rule text or severity | `/vskit:clause update demo-counter CLA-NN "<new rule>"` |
-| Remove a clause | `/vskit:clause remove demo-counter CLA-NN` |
-| List active clauses | `/vskit:clause list demo-counter` |
+| Re-check one clause | `/vskit:clause check demo-counter RUL-01` |
+| Re-check all rules | `/vskit:clause check demo-counter` |
+| Edit rule text or severity | `/vskit:clause update demo-counter RUL-NN "<new rule>"` |
+| Remove a clause | `/vskit:clause remove demo-counter RUL-NN` |
+| List active rules | `/vskit:clause list demo-counter` |

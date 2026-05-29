@@ -19,7 +19,7 @@ The point is not the feature. The point is that this feature has just enough sur
 | `DECISIONS.md` | Always required |
 | `DBSCHEMA.md` | `clicks` table — `Applies: dbschema` is true |
 | `INTERFACE-CONTRACTS.md` | Two HTTP endpoints — `Applies: interface-contracts` is true |
-| `CLAUSES.md` | 3 invariant rules with AI-graded checks — `Applies: clauses` is true (§4.7) |
+| `RULES.md` | 3 invariant rules with AI-graded checks — `Applies: rules` is true (§4.7) |
 | (no `prototypes/`) | No user-facing UI — `Applies` omits `ux` and `prototype` |
 
 ## What the score tells you

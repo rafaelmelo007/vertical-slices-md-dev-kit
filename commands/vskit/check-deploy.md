@@ -1,6 +1,6 @@
 **Task:** Read-only ship-gate evaluation across all features. Writes nothing.
 
-**No arguments required.** Reads all `docs/features/*/SCORE.md` and `TASKS.md` and `DECISIONS.md` and `CLAUSES.md`.
+**No arguments required.** Reads all `docs/features/*/SCORE.md` and `TASKS.md` and `DECISIONS.md` and `RULES.md`.
 
 **For each feature, evaluate hard blocks then soft blocks:**
 
@@ -11,17 +11,17 @@
 - `git diff <last_scored_sha>..HEAD -- docs/features/<slug>/ <SPEC Touches: paths>` is non-empty (score is stale)
 - DECISIONS.md has a row where `Updates` is empty AND the row is not in `## Deferred Items`
 - SPEC §8 `Blocked-by:` lists a feature slug not in `Shipped` state
-- Any active clause in CLAUSES.md with severity `High` or `Critical`, verdict `FAIL`, confidence ≥ 80% (spec OR code check)
+- Any active rule in RULES.md with severity `High` or `Critical`, verdict `FAIL`, confidence ≥ 80% (spec OR code check)
 
 **Soft blocks (exit code 2 — deploy proceeds only with waiver):**
 - Composite score < 8.0
 - Any scored non-security dimension < 7
 - E2E tests do not cover all happy-path ACs (check SCORE.md Test Coverage notes)
-- Any active clause with severity `High` or `Critical`, verdict `FAIL`, confidence 60–79%
-- Any active clause with severity `Medium`, verdict `FAIL`, confidence ≥ 80%
-- Any active clause with severity `Medium` or higher, stale (last code check > 14 days)
+- Any active rule with severity `High` or `Critical`, verdict `FAIL`, confidence 60–79%
+- Any active rule with severity `Medium`, verdict `FAIL`, confidence ≥ 80%
+- Any active rule with severity `Medium` or higher, stale (last code check > 14 days)
 
-Low-severity clause FAILs are reported but do not gate.
+Low-severity rule FAILs are reported but do not gate.
 
 **Output — print per-feature table:**
 ```

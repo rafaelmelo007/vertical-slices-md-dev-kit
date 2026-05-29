@@ -1,17 +1,17 @@
-# Clauses — <Feature Name>
+# Rules — <Feature Name>
 
 **Feature:** <slug>
 **Source:** /vskit:clause add | /vskit:clause check
 **Last updated:** YYYY-MM-DD
 
-> Clauses are invariant rules the feature must hold across the codebase (§4.7).
-> Unlike ACs (testable per turn) and NFRs (measured per release), clauses are
-> AI-graded with confidence. Read §4.7 before adding a clause; clauses are
+> Rules are invariant rules the feature must hold across the codebase (§4.7).
+> Unlike ACs (testable per turn) and NFRs (measured per release), rules are
+> AI-graded with confidence. Read §4.7 before adding a clause; rules are
 > reserved for properties that cannot be cleanly expressed as a single test.
 
-## Active Clauses
+## Active Rules
 
-### CLA-01 — <one declarative sentence stating the rule>
+### RUL-01 — <one declarative sentence stating the rule>
 
 | Field | Value |
 |---|---|
@@ -39,25 +39,25 @@ name lines and conditions, not "looks good".>
 
 <one paragraph: where the clause's requirement is anchored in SPEC/DBSCHEMA/
 INTERFACE-CONTRACTS/DECISIONS. If the spec doesn't mention it, that itself is
-a finding — clauses with no spec anchor should be raised to /vskit:critique spec.>
+a finding — rules with no spec anchor should be raised to /vskit:critique spec.>
 
 ---
 
-### CLA-02 — <next clause>
+### RUL-02 — <next clause>
 
 *(same structure)*
 
 ---
 
-## Removed / Superseded Clauses
+## Removed / Superseded Rules
 
 | ID | Date | Reason | Final verdict (spec / code) | Supersedes |
 |----|------|--------|----------------------------|-------------|
-| CLA-00 | YYYY-MM-DD | Merged into CLA-01 (broader scope) | PASS 89% / PASS 84% | — |
+| RUL-00 | YYYY-MM-DD | Merged into RUL-01 (broader scope) | PASS 89% / PASS 84% | — |
 
-> **Why this table exists:** clauses cannot be silently deleted (§4.7). Removal
+> **Why this table exists:** rules cannot be silently deleted (§4.7). Removal
 > preserves the final verdict and the reason. If a clause was updated rather
-> than removed, the old row lives here with `Supersedes: CLA-NN` pointing at
+> than removed, the old row lives here with `Supersedes: RUL-NN` pointing at
 > its replacement.
 
 ## How to maintain this file
@@ -65,11 +65,11 @@ a finding — clauses with no spec anchor should be raised to /vskit:critique sp
 | Action | Command |
 |---|---|
 | Add a new clause | `/vskit:clause add <slug> "<rule>" --severity=<low\|medium\|high\|critical>` |
-| Re-check one clause | `/vskit:clause check <slug> CLA-NN` |
-| Re-check all clauses | `/vskit:clause check <slug>` |
-| Edit rule text or severity | `/vskit:clause update <slug> CLA-NN "<new rule>"` |
-| Remove a clause | `/vskit:clause remove <slug> CLA-NN` |
-| List active clauses | `/vskit:clause list <slug>` |
+| Re-check one clause | `/vskit:clause check <slug> RUL-NN` |
+| Re-check all rules | `/vskit:clause check <slug>` |
+| Edit rule text or severity | `/vskit:clause update <slug> RUL-NN "<new rule>"` |
+| Remove a clause | `/vskit:clause remove <slug> RUL-NN` |
+| List active rules | `/vskit:clause list <slug>` |
 
-Clauses with `Last code check` older than 14 days are **stale** and count as
+Rules with `Last code check` older than 14 days are **stale** and count as
 INDETERMINATE for ship-gate purposes (soft block) per §4.7.
