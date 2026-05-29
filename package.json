@@ -1,6 +1,6 @@
 {
   "name": "@rafaelmelo007/vskit",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "AI quality gate for spec-first repos: traces every commit to an acceptance criterion, scores 8 quality dimensions, and refuses to ship when the chain breaks.",
   "keywords": [
     "ai",
@@ -27,6 +27,7 @@
   "files": [
     "bin/",
     "lib/",
+    "commands/",
     "scripts/",
     "templates/",
     "vertical-slices-ai-framework.md",
