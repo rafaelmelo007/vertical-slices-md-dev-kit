@@ -51,7 +51,7 @@ Every repo that adopts it gets:
 - A **persistent scoring system** with an 8-dimension rubric built into this document
 - A **work-log** auto-written via hook after every turn — no manual logging
 - A **prototype exposure system** behind basic auth for UI-facing features
-- A **target-aware command library** (`/vskit:review prd`, `/vskit:review spec`, `/vskit:score feature`, `/vskit:score-all`, etc.)
+- A **target-aware command library** (`/vskit:critique prd`, `/vskit:critique spec`, `/vskit:score feature`, `/vskit:score-all`, etc.)
 - **Orchestration commands** (§8.4) that chain the atomic commands end-to-end so a full feature — grill, decisions, tasks, code, tests, score, prototype — runs as a single invocation
 
 ---
@@ -75,7 +75,7 @@ docs/
 │       ├── SPEC.md                 # Vertical-slice spec — sole source of truth
 │       ├── TASKS.md                # Implementation tasks derived from SPEC.md ACs
 │       ├── SCORE.md                # Persistent quality scores (8 dimensions)
-│       ├── DECISIONS.md            # Decision log — populated by /vskit:review spec (§4.5)
+│       ├── DECISIONS.md            # Decision log — populated by /vskit:critique spec (§4.5)
 │       ├── DBSCHEMA.md             # ONLY if "dbschema" in SPEC Applies (§4.2.1)
 │       ├── INTERFACE-CONTRACTS.md  # ONLY if "interface-contracts" in SPEC Applies
 │       └── prototypes/             # ONLY if "prototype" in SPEC Applies
@@ -184,7 +184,7 @@ Idea / User Request
   create docs/features/<slug>/ stubs for each feature
        │
        ▼
-  /vskit:review spec <slug>  ← per feature
+  /vskit:critique spec <slug>  ← per feature
   [prompt-engineer + domain specialists] interrogate SPEC.md
   until Documentation score ≥ 8
   → DECISIONS.md row appended per decision (D-NN)
@@ -210,7 +210,7 @@ Idea / User Request
   Ship gate: composite ≥ 8.0, no dimension < 7, security ≥ 8
 ```
 
-**Orchestration shortcut.** Steps from `/vskit:review spec` through `/vskit:score feature` (and `/vskit:prototype feature` if applicable) chain together as `/vskit:ship feature <slug>`. The full chain from `/vskit:enhance prd` through all derived features is `/vskit:run-pipeline prd <prd-path>`. See §8.4.
+**Orchestration shortcut.** Steps from `/vskit:critique spec` through `/vskit:score feature` (and `/vskit:prototype feature` if applicable) chain together as `/vskit:ship feature <slug>`. The full chain from `/vskit:enhance prd` through all derived features is `/vskit:run-pipeline prd <prd-path>`. See §8.4.
 
 ### 3.2 PRD Template (slim — per INV-1)
 
@@ -337,7 +337,7 @@ docs/features/<feature-slug>/
 ├── SPEC.md                    (stub from §4.3 template — Applies must be declared)
 ├── TASKS.md                   (headers only — populated by /vskit:spec-to-tasks)
 ├── SCORE.md                   (all dimensions initialized at 0)
-├── DECISIONS.md               (header only — appended by /vskit:review spec; §4.5)
+├── DECISIONS.md               (header only — appended by /vskit:critique spec; §4.5)
 ├── DBSCHEMA.md                (created ONLY if "dbschema" in Applies)
 ├── INTERFACE-CONTRACTS.md     (created ONLY if "interface-contracts" in Applies)
 └── prototypes/                (created ONLY if "prototype" in Applies)
@@ -422,7 +422,7 @@ Every SPEC.md must follow this exact structure. Sections may be marked `N/A — 
 
 ## §8 Cross-References
 - **PRD:** docs/PRD.md §6 — F-<NN> line for this feature
-- **Decisions:** DECISIONS.md  *(rationale journal; updated by /vskit:review spec)*
+- **Decisions:** DECISIONS.md  *(rationale journal; updated by /vskit:critique spec)*
 - **DB Schema:** DBSCHEMA.md  *(only if "dbschema" in Applies)*
 - **Interface Contracts:** INTERFACE-CONTRACTS.md  *(only if "interface-contracts" in Applies)*
 - **Tasks:** TASKS.md
@@ -462,7 +462,7 @@ DECISIONS.md is the **rationale journal** for a feature. Per INV-1, it never res
 # Decisions — <Feature Name>
 
 **Feature:** <slug>
-**Source:** /vskit:review spec <slug> sessions
+**Source:** /vskit:critique spec <slug> sessions
 **Last updated:** YYYY-MM-DD
 
 > This file is the audit trail for design decisions made during critique rounds.
@@ -483,7 +483,7 @@ DECISIONS.md is the **rationale journal** for a feature. Per INV-1, it never res
 | DEF-01 | Per-tenant rate limits | Out of scope for v1 — single-tenant launch | Multi-tenant epic opens |
 ```
 
-**Propagation contract** (enforced by `/vskit:review spec` and audited by `/vskit:score feature` Dim 1):
+**Propagation contract** (enforced by `/vskit:critique spec` and audited by `/vskit:score feature` Dim 1):
 
 | Decision affects… | Canonical file updated in the SAME spec-grill run | DECISIONS row `Updates` value |
 |---|---|---|
@@ -685,7 +685,7 @@ Silent over-budget operation is a Rule 12 violation. The framework MUST report w
 
 ### 6.1 When Required
 
-A feature with `**Prototype: required**` in its SPEC.md must reach `**Prototype: approved**` before moving from `Spec Ready` to `In Development`. The UX specialist sets the field during `/vskit:review spec`. Backend-only features are automatically `N/A`.
+A feature with `**Prototype: required**` in its SPEC.md must reach `**Prototype: approved**` before moving from `Spec Ready` to `In Development`. The UX specialist sets the field during `/vskit:critique spec`. Backend-only features are automatically `N/A`.
 
 ### 6.2 Folder Structure
 
@@ -758,7 +758,7 @@ Ship gate floors apply to every scored dimension. A feature whose Logging or NFR
 | 5–6 | 1 gate criterion not met (cannot ship without waiver) |
 | 0–4 | Critical fail (≥2 gate criteria not met or category broken — hard block) |
 
-Two scorers with the same evidence should land on the same integer using this rule. If they don't, the rubric is the bug — file a `/vskit:review spec` revision.
+Two scorers with the same evidence should land on the same integer using this rule. If they don't, the rubric is the bug — file a `/vskit:critique spec` revision.
 
 #### Dimension 1 — Documentation (owner: prompt-engineer)
 
@@ -900,14 +900,14 @@ All commands are target-aware. Commands that operate on a specific feature or PR
 | Command | Description | Output |
 |---------|-------------|--------|
 | `/vskit:enhance prd <prd-path>` | 11 parallel subagents score and critique the PRD independently. Iterate until all scores ≥ 9. Appends one row per round to PRD `## Score History`. | Updated PRD §Round-Table Scores + Score History |
-| `/vskit:review prd <prd-path>` | ** Specialists interrogate the PRD for weak evidence, missing sections, and vague metrics. | Annotated PRD with inline questions; §13 Open Questions updated |
+| `/vskit:critique prd <prd-path>` | ** Specialists interrogate the PRD for weak evidence, missing sections, and vague metrics. | Annotated PRD with inline questions; §13 Open Questions updated |
 | `/vskit:prd-to-features <prd-path>` | Extract feature list from PRD, create `docs/features/<slug>/` stub folders for each. | Feature folders with stub SPEC.md, TASKS.md, DBSCHEMA.md, INTERFACE-CONTRACTS.md, SCORE.md, DECISIONS.md |
 
 ### 8.2 Feature Commands
 
 | Command | Description | Output |
 |---------|-------------|--------|
-| `/vskit:review spec <slug>` | ** Specialists interrogate SPEC.md for weak ACs, missing NFRs, edge cases. Sets `Prototype:` field. **For every decision reached, appends a row to DECISIONS.md AND propagates the change to the canonical file in the same run** (§4.5 propagation contract). Unresolved items become `DEF-NN` rows — never silently dropped (INV-3). | Updated DECISIONS.md (D-NN rows); updated SPEC.md §3/§4/§9 and/or DBSCHEMA.md / INTERFACE-CONTRACTS.md per propagation contract |
+| `/vskit:critique spec <slug>` | ** Specialists interrogate SPEC.md for weak ACs, missing NFRs, edge cases. Sets `Prototype:` field. **For every decision reached, appends a row to DECISIONS.md AND propagates the change to the canonical file in the same run** (§4.5 propagation contract). Unresolved items become `DEF-NN` rows — never silently dropped (INV-3). | Updated DECISIONS.md (D-NN rows); updated SPEC.md §3/§4/§9 and/or DBSCHEMA.md / INTERFACE-CONTRACTS.md per propagation contract |
 | `/vskit:spec-to-tasks feature <slug>` | Break SPEC.md ACs into TASKS.md implementation tasks with owner and priority. Reads DECISIONS.md; tasks whose existence is driven by a decision get the `Decision: D-NN` column populated. | Populated `TASKS.md` (with Decision column) |
 | `/vskit:implement feature <slug>` | Implement all Pending tasks in TASKS.md per the SPEC. Commits carry `Closes-AC: <slug>#AC-NN` and (when applicable) `Decision: <slug>#D-NN` trailers. | Code changes; TASKS.md statuses updated |
 | `/vskit:test feature <slug>` | Run tests scoped to this feature. Report failures. | Test output; SCORE.md §test-coverage updated |
@@ -948,8 +948,8 @@ Orchestration commands chain the atomic commands above into single-invocation wo
 
 | Command | Chained steps | Halts when |
 |---------|---------------|------------|
-| `/vskit:ship feature <slug>` | `/vskit:review spec` → `/vskit:spec-to-tasks feature` → `/vskit:implement feature` → `/vskit:test feature` → `/vskit:score feature` → `/vskit:prototype feature` *(only if `prototype` in Applies)* | spec-grill leaves orphan DECISIONS rows; implement leaves a TASKS row not `Done`; test fails; score yields any scored dimension < 7 or security < 8 |
-| `/vskit:run-pipeline prd <prd-path>` | `/vskit:enhance prd` (iterate until all ≥ 9, max 5 rounds) → `/vskit:review prd` → `/vskit:prd-to-features` → for each created feature folder: `/vskit:ship feature <slug>` | round-table fails to reach all ≥ 9 within 5 rounds; any `/vskit:ship feature` halts |
+| `/vskit:ship feature <slug>` | `/vskit:critique spec` → `/vskit:spec-to-tasks feature` → `/vskit:implement feature` → `/vskit:test feature` → `/vskit:score feature` → `/vskit:prototype feature` *(only if `prototype` in Applies)* | spec-grill leaves orphan DECISIONS rows; implement leaves a TASKS row not `Done`; test fails; score yields any scored dimension < 7 or security < 8 |
+| `/vskit:run-pipeline prd <prd-path>` | `/vskit:enhance prd` (iterate until all ≥ 9, max 5 rounds) → `/vskit:critique prd` → `/vskit:prd-to-features` → for each created feature folder: `/vskit:ship feature <slug>` | round-table fails to reach all ≥ 9 within 5 rounds; any `/vskit:ship feature` halts |
 | `/vskit:ship feature <slug>` | `/vskit:test feature` → `/vskit:score feature` (cache rule per §8.2) → `/vskit:check deploy` → `/vskit:deploy` *(prompts on soft-block per §10.3)* | hard-block at deploy-check; user declines soft-block prompt |
 | `/vskit:ship-all` | for each feature in `Spec Ready` or `Testing`: `/vskit:ship feature <slug>` | first feature that halts |
 
@@ -983,7 +983,7 @@ Framework: <path-to-this-spec>
 - `Weekly token budget: <N>`     — override the §5.3 default of 100 000
 ```
 
-A repo MUST NOT redefine `/vskit:check deploy`, `/vskit:score`, `/vskit:review spec`, `/vskit:review prd`, `/vskit:audit-traceability`, or any other framework-owned command. Doing so silently changes ship-gate semantics and breaks cross-repo expectations.
+A repo MUST NOT redefine `/vskit:check deploy`, `/vskit:score`, `/vskit:critique spec`, `/vskit:critique prd`, `/vskit:audit-traceability`, or any other framework-owned command. Doing so silently changes ship-gate semantics and breaks cross-repo expectations.
 
 ---
 

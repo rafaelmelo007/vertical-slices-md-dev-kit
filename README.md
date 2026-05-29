@@ -63,14 +63,14 @@ Every command is target-aware (`<slug>`, `<prd-path>`) and writes specific artif
 | Command | Purpose | Writes? |
 |---|---|---|
 | `/vskit:enhance prd <prd-path>` | Round-table: 11 specialists score 0–10 in parallel until all ≥ 9 | yes — PRD score rows |
-| `/vskit:review prd <prd-path>` | Specialists interrogate; adds inline `> Q:` questions | yes — PRD annotations + §13 |
+| `/vskit:critique prd <prd-path>` | Specialists interrogate; adds inline `> Q:` questions | yes — PRD annotations + §13 |
 | `/vskit:prd-to-features <prd-path>` | Extract §6 features and scaffold `docs/features/<slug>/` | yes — feature stubs |
 
 #### Per-feature spec → ship
 
 | Command | Purpose | Writes? |
 |---|---|---|
-| `/vskit:review spec <slug>` | Interrogate SPEC; **propagates each decision to its canonical file in the same run** | yes — SPEC + DBSCHEMA + INTERFACE-CONTRACTS + DECISIONS |
+| `/vskit:critique spec <slug>` | Interrogate SPEC; **propagates each decision to its canonical file in the same run** | yes — SPEC + DBSCHEMA + INTERFACE-CONTRACTS + DECISIONS |
 | `/vskit:spec-to-tasks feature <slug>` | Break ACs into TASKS rows; tag decision-driven ones | yes — TASKS rows |
 | `/vskit:implement feature <slug>` | Write code; commits carry `Closes-AC:` + `Decision:` trailers | yes — source + commits |
 | `/vskit:test feature <slug>` | Run tests scoped to feature's `Touches:` pathspec | yes — SCORE test-coverage notes |
@@ -138,12 +138,12 @@ Every command is target-aware (`<slug>`, `<prd-path>`) and writes specific artif
 
 The three commands that drive 80% of the daily flow, shown with full output.
 
-#### `/vskit:review spec <slug>` — the decision-propagation contract in action
+#### `/vskit:critique spec <slug>` — the decision-propagation contract in action
 
 Each decision raised by a specialist appends a DECISIONS row AND updates the canonical file it changes, in the same run. Orphan decisions are forbidden — that's the propagation contract.
 
 ```
-$ /vskit:review spec demo-counter
+$ /vskit:critique spec demo-counter
 [critique] reading docs/features/demo-counter/SPEC.md
 [critique] Applies: [] — interrogating to set it
   → SPEC frontmatter updated: Applies: [dbschema, interface-contracts]
@@ -429,7 +429,7 @@ PRD.md  (portfolio-wide, one per product)
   ↓ /vskit:prd-to-features
 docs/features/<slug>/
   ├── SPEC.md          ← contract: what + acceptance criteria
-  │     ↓ /vskit:review spec  (specialists interrogate)
+  │     ↓ /vskit:critique spec  (specialists interrogate)
   │     ↑ updates from
   │   DECISIONS.md     ← rationale journal (the "why")
   │     ↓ propagates to
