@@ -47,48 +47,7 @@ What it does:
 
 **Requirements:** Node 18+, bash, jq (for the Stop hook).
 
-<details>
-<summary><strong>Other install methods</strong></summary>
-
-#### Ask your AI to apply it (no Node required)
-
-```bash
-# Clone once, anywhere on disk
-git clone https://github.com/rafaelmelo007/vertical-slices-md-dev-kit.git ~/vskit
-```
-
-Then in your target repo, with Claude Code (or Cursor / Aider / any AI assistant with file access) open, paste this prompt:
-
-> Apply the vertical-slices-md-dev-kit bundle from `~/vskit` to this repo, following its `ADOPTION.md` guide. Stop and ask before any destructive change.
-
-#### Copy without AI (`degit`)
-
-```bash
-npx degit rafaelmelo007/vertical-slices-md-dev-kit docs/bundle
-```
-
-Then follow `docs/bundle/ADOPTION.md` for the Stop hook + doc tree + CLAUDE.md steps (~5 minutes of mechanical work).
-
-<details>
-<summary><strong>Other ways to vendor the kit</strong></summary>
-
-```bash
-# git submodule (preserves upstream history; pulls updates with `git submodule update`)
-git submodule add https://github.com/rafaelmelo007/vertical-slices-md-dev-kit.git docs/bundle
-
-# shallow clone + copy (snapshot-in-time; no upstream tracking)
-git clone --depth 1 https://github.com/rafaelmelo007/vertical-slices-md-dev-kit.git /tmp/vskit \
-  && cp -r /tmp/vskit/. docs/bundle/ \
-  && rm -rf docs/bundle/.git
-```
-
-Full walkthrough → [`ADOPTION.md`](./ADOPTION.md)
-
-</details>
-
 ### Commands — what they do and what they write
-
-> Full simulated end-to-end run with every command's terminal output → [`WALKTHROUGH.md`](./WALKTHROUGH.md)
 
 Every command is target-aware (`<slug>`, `<prd-path>`) and writes specific artifacts. The whole vocabulary in nine phase tables, then four inline walkthroughs for the commands that drive 80% of daily flow.
 
@@ -96,7 +55,7 @@ Every command is target-aware (`<slug>`, `<prd-path>`) and writes specific artif
 
 | Command | Purpose | Writes? |
 |---|---|---|
-| `/vskit:init-framework` | Scaffold doc tree, install Stop hook, write CLAUDE.md stub, install pre-push hook | yes — full `docs/` + `.claude/` + hooks |
+| `npx vskit init` | Install framework commands, Stop hook, and scaffold docs/ — run once from the repo root | yes — `.claude/vskit.md`, `.claude/settings.json`, `docs/` tree |
 | `/vskit:init-prototypes` | Sub-init when a feature adds `prototype` to Applies (creates htpasswd + nginx snippet) | yes — htpasswd |
 
 #### PRD phase
@@ -177,22 +136,7 @@ Every command is target-aware (`<slug>`, `<prd-path>`) and writes specific artif
 
 ### Four exemplary walkthroughs
 
-The four commands that drive 80% of the daily flow, shown with full output. The rest follow the same shape — see [`WALKTHROUGH.md`](./WALKTHROUGH.md) for every command exercised end-to-end on one feature.
-
-#### `/vskit:init-framework` — the only command you run once
-
-```
-$ /vskit:init-framework
-[init-framework] scaffolding vertical-slices-md-dev-kit v2.0 in /home/dev/clickcount
-[init-framework] creating doc tree...
-  ✓ docs/PRD.md (stub)
-  ✓ docs/{prds,features,worklog,prototypes,incidents,process,technical}/
-[init-framework] installing Stop hook → .claude/settings.json
-Install pre-push hook that runs /vskit:audit-traceability and /vskit:check deploy? [Y/n] y
-Done. Next step: write your first PRD draft at docs/prds/draft/<date>-<slug>.md
-```
-
-**Writes:** full `docs/` tree, `CLAUDE.md`, `.claude/settings.json`, `.claude/scripts/worklog-stop-hook.sh`, `.git/hooks/pre-push`, worklog row.
+The three commands that drive 80% of the daily flow, shown with full output.
 
 #### `/vskit:critique spec <slug>` — the decision-propagation contract in action
 
@@ -502,7 +446,7 @@ docs/features/<slug>/
 
 **Read order for a new feature:** SPEC → DECISIONS → CLAUSES (if any) → TASKS → SCORE. The first three are *what the feature is*; the last two are *how it gets built and graded*.
 
-## What's in this bundle
+## What's in this repo
 
 ```
 vertical-slices-md-dev-kit/
@@ -511,20 +455,23 @@ vertical-slices-md-dev-kit/
 ├── CONTRIBUTING.md                    ← how to file issues and PRs
 ├── SECURITY.md                        ← vulnerability disclosure policy
 ├── CHANGELOG.md                       ← version history
-├── ADOPTION.md                        ← under-an-hour adoption tutorial
-├── WALKTHROUGH.md                     ← every command simulated end-to-end on one feature
-├── vertical-slices-ai-framework.md    ← the spec (1027 lines, normative)
-├── settings.json.snippet              ← .claude/settings.json Stop hook block
+├── package.json                       ← npm package (name: vskit)
+├── bin/
+│   └── vskit.js                       ← CLI entry point
+├── lib/
+│   ├── init.js                        ← npx vskit init
+│   ├── add-feature.js                 ← npx vskit add-feature
+│   └── version.js
+├── vertical-slices-ai-framework.md    ← the spec (normative); installed to .claude/vskit.md
 ├── scripts/
-│   └── worklog-stop-hook.sh           ← reference implementation of §5.2 Stop hook
+│   └── worklog-stop-hook.sh           ← Stop hook; installed to .claude/ on init
 ├── templates/
 │   ├── PRD.md                         ← §3.2 PRD template
 │   ├── SPEC.md                        ← §4.3 SPEC template
 │   ├── TASKS.md                       ← §4.4 tasks template
 │   ├── DECISIONS.md                   ← §4.5 decisions template
 │   ├── CLAUSES.md                     ← §4.7 clauses template (v1.8)
-│   ├── SCORE.md                       ← §7.3 score template
-│   └── CLAUDE.md-snippet.md           ← §9 CLAUDE.md §Commands snippet
+│   └── SCORE.md                       ← §7.3 score template
 ├── example/
 │   └── features/demo-counter/         ← one fully-populated feature folder (incl. CLAUSES.md)
 └── case-studies/

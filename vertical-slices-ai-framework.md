@@ -536,7 +536,7 @@ Three fields are mandatory per migration; missing any field is a Dim 7 (Security
 
 **When to use a clause vs. an AC:** if the rule can be expressed as one test against one request, write an AC. If the rule is a property that has to hold across many code paths and would require many tests to verify deterministically — "no PII anywhere in logs," "no protected route lacks auth middleware," "every write op produces an audit row" — write a clause.
 
-**Storage.** `docs/features/<slug>/CLAUSES.md` per the template referenced from §4.2.1. Created on first `/vskit:clause add` or by `/vskit:init-framework` if `clauses` is in the feature's `Applies:` at scaffold time.
+**Storage.** `docs/features/<slug>/CLAUSES.md` per the template referenced from §4.2.1. Created on first `/vskit:clause add` or by `npx vskit add-feature` when `clauses` is included in the feature's `Applies:` at scaffold time.
 
 **Per-clause record.** Every active clause carries:
 
@@ -622,11 +622,11 @@ The Stop hook runs after each Claude Code turn and appends one row to `docs/work
 
 **Canonical script location:** `<framework-bundles-dir>/worklog-stop-hook.sh` — referenced (not copied) from each repo's settings.json. The framework ships the reference implementation alongside this spec; install it on the host once, point every repo at the same path.
 
-### 5.2.1 Pre-Push Hook (opt-in, installed by `/vskit:init-framework`)
+### 5.2.1 Pre-Push Hook (opt-in)
 
 Repo-edge enforcement for INV-3 (fail loud) and INV-4 (enforceability). When the user runs `git push`, the hook runs `/vskit:audit-traceability` then `/vskit:check deploy` and refuses the push on either failure. `--no-verify` is the documented waiver — it bypasses the hook, leaving `/vskit:check deploy` at deploy time as the last unbypassable line of defense.
 
-**Installation.** Created at `.git/hooks/pre-push` by `/vskit:init-framework` when the operator accepts the prompt. Permission `0755`. Idempotent: re-installation replaces the framework-owned block delimited by `# >>> framework v1.6 BEGIN` / `# <<< framework v1.6 END`, preserving any user-added hook logic outside the delimiters.
+**Installation.** Copy the reference implementation to `.git/hooks/pre-push` and `chmod 0755`. Idempotent: re-installation replaces the framework-owned block delimited by `# >>> framework v1.6 BEGIN` / `# <<< framework v1.6 END`, preserving any user-added hook logic outside the delimiters.
 
 **Reference implementation.**
 
@@ -940,7 +940,6 @@ All commands are target-aware. Commands that operate on a specific feature or PR
 | `/vskit:audit-traceability [<since-ref>]` | Scan `git log <since>..HEAD` for `Closes-AC:` trailers on every non-merge commit. Exit non-zero if any commit lacks one (unless `CLAUDE.md` declares `Traceability: aspirational` per §0.1). **Default `<since-ref>`:** `git describe --tags --abbrev=0` if any tag exists, else `git merge-base HEAD origin/main`. Honors both release-tagged and trunk-based workflows. | Terminal report; non-zero exit on missing trailers |
 | `/vskit:clause check-all [--feature=<slug>]` | Run `/vskit:clause check` across every feature folder with `clauses` in Applies. Per-feature exit codes aggregated: non-zero if any feature reports High/Critical FAIL @ confidence ≥ 80%. | All CLAUSES.md files updated; aggregated exit code |
 | `/vskit:clause audit` | Read-only scan of all CLAUSES.md files. Reports stale clauses (last code check > 14 days), failing clauses, and INDETERMINATE clauses. Sorted by severity then staleness. Exit non-zero if any High/Critical FAIL or stale High/Critical. **Writes nothing.** | Terminal report + exit code |
-| `/vskit:init-framework` | One-shot scaffolder for a new repo. Creates `docs/` tree (PRD.md stub, prds/, features/, worklog/, prototypes/, incidents/, process/, technical/, bundles/), writes `CLAUDE.md` §Commands stub, installs the Stop hook to `.claude/settings.json` (with the worklog-stop-hook.sh script embedded as a heredoc), then prompts: `Install pre-push hook that runs /vskit:audit-traceability and /vskit:check deploy? [Y/n]`. Idempotent — re-running tops up missing pieces without overwriting existing content. | Created files; one prompt; updated `.claude/settings.json` |
 | `/vskit:init-prototypes` | Conditional sub-init. Run when a feature adds `prototype` to `Applies:`. Creates `docs/prototypes/index.html` skeleton, prompts for the `<app-name>` slug and basic-auth username, generates the htpasswd file at `<proxy-secrets-dir>/htpasswd/<app>-prototypes`, writes the reference §6.3 reverse-proxy block to stdout for the operator to paste into the proxy config. | htpasswd file; printed proxy config |
 
 ### 8.4 Orchestration Commands
@@ -984,7 +983,7 @@ Framework: <path-to-this-spec>
 - `Weekly token budget: <N>`     — override the §5.3 default of 100 000
 ```
 
-A repo MUST NOT redefine `/vskit:check deploy`, `/vskit:score`, `/vskit:critique spec`, `/vskit:critique prd`, `/vskit:audit-traceability`, `/vskit:init-framework`, or any other framework-owned command. Doing so silently changes ship-gate semantics and breaks cross-repo expectations.
+A repo MUST NOT redefine `/vskit:check deploy`, `/vskit:score`, `/vskit:critique spec`, `/vskit:critique prd`, `/vskit:audit-traceability`, or any other framework-owned command. Doing so silently changes ship-gate semantics and breaks cross-repo expectations.
 
 ---
 

@@ -6,16 +6,16 @@ Thanks for the interest. The kit is intentionally small — the bar for adding a
 
 1. **Read [`vertical-slices-ai-framework.md`](./vertical-slices-ai-framework.md).** It is the normative spec. §0 invariants and §0.1 ("what this framework forces") are non-negotiable.
 2. **Read [`CHANGELOG.md`](./CHANGELOG.md).** Most "should we add X?" questions were already raised and either accepted, deferred, or rejected with rationale.
-3. **For new commands or new dimensions, open an issue first.** Don't write code or doc for something the kit may never accept.
+3. **For new commands, CLI features, or new dimensions, open an issue first.** Don't write code or doc for something the kit may never accept.
 
 ## What's in scope
 
 - **Bug fixes** against documented behavior in the spec.
-- **New reference scripts** that implement spec-described behavior (e.g., the orchestration commands are spec-described but not yet shipped as runtime binaries — implementations welcome).
+- **New CLI commands** (`bin/`, `lib/`) that implement spec-described behavior not yet in the CLI.
 - **New language/stack-specific examples** under `example/` (a Python repo example, a Rust repo example, etc.).
 - **New case studies** under `case-studies/` from real adopters. See `case-studies/README.md` for the rubric.
 - **Documentation clarifications** — typos, broken links, ambiguous wording.
-- **Translations** of `README.md`, `ADOPTION.md`, `WALKTHROUGH.md` (the spec itself stays in English to remain normative).
+- **Translations** of `README.md` (the spec itself stays in English to remain normative).
 - **New templates** that fit the existing artifact set (see §1 doc tree). New artifact types require spec changes.
 
 ## What's out of scope
