@@ -26,7 +26,7 @@
 
 - AC-07: `server/click/handler.rs:42` logs full request including `req.peer_addr()`. Violates D-03. Filed as part of T-06.
 - **RUL-01:** same root cause as AC-07. Will clear when ACTION-04 lands.
-- **RUL-03:** stale clause (last code-check 2026-05-08). Run `/vskit:clause check demo-counter RUL-03` to refresh.
+- **RUL-03:** stale rule (last code-check 2026-05-08). Run `/vskit:rule check demo-counter RUL-03` to refresh.
 
 ## Score History
 

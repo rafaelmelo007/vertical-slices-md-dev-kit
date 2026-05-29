@@ -15,7 +15,7 @@ Adopting the bundle on `bab` produces:
 
 1. **Real evidence** of the bundle running on a real (single-user) repo, not a worked example.
 2. **A second case study**, lifting Proof from 3 → ~6.
-3. **A live test** of whether the §11 adoption checklist + ADOPTION.md tutorial actually work in under an hour.
+3. **A live test** of whether `npx @rafaelmelo007/vskit init` + the getting-started flow actually work in under an hour.
 
 ## Pre-adoption state (snapshot 2026-05-23)
 
@@ -27,10 +27,10 @@ Adopting the bundle on `bab` produces:
 ## What to fill out when adoption happens
 
 ### 1. Time-to-adopt
-- Wallclock from "decide to adopt" to "first commit with `Closes-AC:` trailer". Target: under 60 minutes per ADOPTION.md.
+- Wallclock from "decide to adopt" to "first commit with `Closes-AC:` trailer". Target: under 60 minutes.
 
 ### 2. Friction list
-- Anything the ADOPTION tutorial missed.
+- Anything the `vskit init` flow missed.
 - Any spec ambiguity that required a re-read.
 - Any reference script that did not work out of the box on Windows.
 

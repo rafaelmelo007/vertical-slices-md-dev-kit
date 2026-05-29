@@ -24,7 +24,7 @@ These are settled non-goals — please don't propose them without a spec amendme
 
 - A hosted SaaS dashboard. The kit is file-based by design (INV-1: single source of truth).
 - Portfolio-level / cross-repo governance. Out of scope per spec §1.
-- A 9th scoring dimension. Clauses (§4.7) cover the invariant-rule gap; further dimensions dilute the existing ones (see CHANGELOG v1.8 rationale).
+- A 9th scoring dimension. Rules (§4.7) cover the invariant-rule gap; further dimensions dilute the existing ones (see CHANGELOG v1.8 rationale).
 - Backward-compatibility shims for v1.x command names. v2.0 broke them by design.
 - A `dev-kit.md` instruction file *for the AI*. Use the platform-native one (`CLAUDE.md`, `GEMINI.md`, `AGENTS.md`). Minimal-surface-area principle.
 
@@ -42,7 +42,7 @@ A MAJOR-bump PR needs a migration table in `CHANGELOG.md` mapping every breaking
 
 Include:
 - Kit version (from `CHANGELOG.md` or the spec frontmatter)
-- Which file in the kit you were following (spec section, ADOPTION step, WALKTHROUGH day)
+- Which file in the kit you were following (spec section, command name)
 - What you did and what happened
 - What you expected to happen
 

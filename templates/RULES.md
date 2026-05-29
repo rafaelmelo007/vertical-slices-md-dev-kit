@@ -1,7 +1,7 @@
 # Rules — <Feature Name>
 
 **Feature:** <slug>
-**Source:** /vskit:clause add | /vskit:clause check
+**Source:** /vskit:rule add | /vskit:rule check
 **Last updated:** YYYY-MM-DD
 
 > Rules are invariant rules the feature must hold across the codebase (§4.7).
@@ -64,12 +64,12 @@ a finding — rules with no spec anchor should be raised to /vskit:critique spec
 
 | Action | Command |
 |---|---|
-| Add a new clause | `/vskit:clause add <slug> "<rule>" --severity=<low\|medium\|high\|critical>` |
-| Re-check one clause | `/vskit:clause check <slug> RUL-NN` |
-| Re-check all rules | `/vskit:clause check <slug>` |
-| Edit rule text or severity | `/vskit:clause update <slug> RUL-NN "<new rule>"` |
-| Remove a clause | `/vskit:clause remove <slug> RUL-NN` |
-| List active rules | `/vskit:clause list <slug>` |
+| Add a new rule | `/vskit:rule add <slug> "<rule>" --severity=<low\|medium\|high\|critical>` |
+| Re-check one rule | `/vskit:rule check <slug> RUL-NN` |
+| Re-check all rules | `/vskit:rule check <slug>` |
+| Edit rule text or severity | `/vskit:rule update <slug> RUL-NN "<new rule>"` |
+| Remove a rule | `/vskit:rule remove <slug> RUL-NN` |
+| List active rules | `/vskit:rule list <slug>` |
 
 Rules with `Last code check` older than 14 days are **stale** and count as
 INDETERMINATE for ship-gate purposes (soft block) per §4.7.

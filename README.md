@@ -396,7 +396,7 @@ No coordinated deploy window required.
 **Example excerpt** ([`example/features/demo-counter/RULES.md`](./example/features/demo-counter/RULES.md)):
 
 ```markdown
-### CLA-01 — Client IP addresses must never appear in log lines
+### RUL-01 — Client IP addresses must never appear in log lines
 
 | Field | Value |
 |---|---|

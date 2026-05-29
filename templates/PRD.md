@@ -41,4 +41,4 @@
 | Date | Round | Min Score | Specialists < 9 | Notes |
 |------|-------|-----------|-----------------|-------|
 
-> Appended by `/vskit:review prd` after every round. Per INV-1, consecutive identical rows (same Min Score AND same Specialists < 9 set) are deduplicated: the most recent row's Date column expands to a range `<first>..<last>`.
+> Appended by `/vskit:enhance prd` after every round. Per INV-1, consecutive identical rows (same Min Score AND same Specialists < 9 set) are deduplicated: the most recent row's Date column expands to a range `<first>..<last>`.

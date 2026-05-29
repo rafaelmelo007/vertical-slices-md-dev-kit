@@ -6,6 +6,44 @@ The format is loosely [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), 
 
 ---
 
+## [2.2] — 2026-05-29
+
+The "rule" release. Renames the `clause` concept to `rule` throughout for consistency with standard terminology. Adds `/vskit:enhance prd` as the canonical name for the PRD round-table command.
+
+### Changed
+- **`clause` → `rule`** everywhere: `CLAUSES.md` → `RULES.md`, `CLA-NN` IDs → `RUL-NN`, `Applies: clauses` → `Applies: rules`, all command names `/vskit:clause *` → `/vskit:rule *`.
+- **`/vskit:review prd` renamed to `/vskit:enhance prd`** — round-table commands improve the artifact; `enhance` names the intent correctly. `/vskit:critique prd` and `/vskit:critique spec` retain `critique` (interrogation, not improvement).
+
+### Migration (v2.1 → v2.2)
+
+| Old | New |
+|-----|-----|
+| `CLAUSES.md` | `RULES.md` |
+| `Applies: clauses` | `Applies: rules` |
+| `CLA-NN` IDs | `RUL-NN` IDs |
+| `/vskit:clause add\|remove\|update\|check\|list\|check-all\|audit` | `/vskit:rule add\|remove\|update\|check\|list\|check-all\|audit` |
+| `/vskit:review prd` | `/vskit:enhance prd` |
+
+---
+
+## [2.1] — 2026-05-28
+
+The "native commands" release. Splits the monolithic `vskit.md` framework file into 35 individual `.claude/commands/vskit/` files — one per command — so each prompt loads only when its command is invoked, not on every turn.
+
+### Changed
+- **`npx @rafaelmelo007/vskit init`** replaces the old `/vskit:init-framework` in-repo command. The CLI installs the 35 command files directly to `.claude/commands/vskit/`, wires the Stop hook, appends CLAUDE.md overrides, and scaffolds the docs/ tree. No manual copy-paste.
+- **35 individual command files** replace the monolithic `vskit.md`. Each file is a self-contained Claude Code slash command loaded on demand.
+- **`vertical-slices-ai-framework.md`** stays in the npm package as a normative reference but is no longer auto-loaded into the AI context on every turn.
+
+### Removed
+- `/vskit:init-framework` — superseded by the `vskit init` CLI command.
+- `ADOPTION.md`, `WALKTHROUGH.md`, `settings.json.snippet`, `templates/CLAUDE.md-snippet.md` — superseded by `npx @rafaelmelo007/vskit init`.
+
+### Added
+- **npm package `@rafaelmelo007/vskit`** — install via `npx @rafaelmelo007/vskit init` or `npm i -g @rafaelmelo007/vskit`.
+
+---
+
 ## [2.0] — 2026-05-23
 
 The "great rename" release. Every command moves to verb-first form and gains a `vskit:` namespace prefix to avoid collision with built-in Claude Code skills (`/init`, `/review`, `/security-review`, `/verify`). Twelve commands renamed, three deleted. Brand-identity artifacts (BRAND.md) dropped — the framework now has a descriptive name and no separate brand.
@@ -17,7 +55,7 @@ Every old command name stops working. Every adopter who already has muscle memor
 
 | Old command | New command | Reason |
 |---|---|---|
-| `/round-table prd <path>` | `/vskit:review prd <path>` | "round-table" was an Arthurian/meeting metaphor; literal "review" survives translation |
+| `/round-table prd <path>` | `/vskit:enhance prd <path>` | "round-table" was an Arthurian/meeting metaphor; renamed to "enhance" in v2.2 (round-table = improvement, not interrogation) |
 | `/prd-grill <path>` | `/vskit:critique prd <path>` | "grill" was a cooking-as-interrogation metaphor; noun-verb order was backwards |
 | `/spec-grill <slug>` | `/vskit:critique spec <slug>` | same metaphor; same ordering fix |
 | `/spec-audit` | `/vskit:audit spec [<slug>]` | noun-verb backwards; parallels `/vskit:audit-traceability` |
@@ -33,8 +71,8 @@ Every old command name stops working. Every adopter who already has muscle memor
 | `/score feature <slug>` | `/vskit:score feature <slug>` | kept; prefixed only |
 | `/score-all` | `/vskit:score-all` | kept; prefixed only |
 | `/prototype feature <slug>` | `/vskit:prototype feature <slug>` | kept; prefixed only |
-| `/clause add\|remove\|update\|check\|list` | `/vskit:clause add\|remove\|update\|check\|list` | kept; prefixed only |
-| `/clause check-all` | `/vskit:clause check-all` | kept; prefixed only |
+| `/clause add\|remove\|update\|check\|list` | `/vskit:rule add\|remove\|update\|check\|list` | kept; prefixed only; renamed clause→rule in v2.2 |
+| `/clause check-all` | `/vskit:rule check-all` | kept; prefixed only; renamed in v2.2 |
 | `/project-status` | `/vskit:project-status` | kept; prefixed only |
 | `/next-task` | `/vskit:next-task` | kept; prefixed only |
 | `/open-questions` | `/vskit:open-questions` | kept; prefixed only |
@@ -45,7 +83,7 @@ Every old command name stops working. Every adopter who already has muscle memor
 | `/security-review` | `/vskit:security-review` | kept; prefixed only |
 | `/gen-prototype-index` | `/vskit:gen-prototype-index` | kept; prefixed only |
 | `/audit-traceability` | `/vskit:audit-traceability` | kept; prefixed only |
-| `/init-framework` | `/vskit:init-framework` | kept; prefixed only |
+| `/init-framework` | *(removed in v2.1)* | superseded by `npx @rafaelmelo007/vskit init` CLI |
 | `/init-prototypes` | `/vskit:init-prototypes` | kept; prefixed only |
 | `/ship feature <slug>` | `/vskit:ship feature <slug>` | kept; prefixed only |
 | `/ship-all` | `/vskit:ship-all` | kept; prefixed only |
@@ -74,26 +112,26 @@ The eight scoring dimensions, the lifecycle states, the ship-gate semantics, the
 
 ## [1.8] — 2026-05-23
 
-The "clauses" release. Adds a third class of feature requirement — invariant rules with AI-graded compliance checks — sitting alongside ACs (testable behavior) and NFRs (measured properties). Closes a real gap: properties that hold across the whole codebase and cannot be expressed as a single unit test.
+The "rules" release (originally shipped as "clauses"; renamed to `rule` in v2.2). Adds a third class of feature requirement — invariant rules with AI-graded compliance checks — sitting alongside ACs (testable behavior) and NFRs (measured properties). Closes a real gap: properties that hold across the whole codebase and cannot be expressed as a single unit test.
 
 ### Added
-- **§4.7 Clauses** — new feature-scoped artifact (`CLAUSES.md`). Each clause carries an ID, severity (Low/Medium/High/Critical), rule text, last spec check, last code check, top-5 enforcement files, and reasoning. Verdicts are PASS/FAIL/INDETERMINATE with a confidence percentage because the check is interpretive, not deterministic.
-- **`Applies: clauses`** — opt-in declaration in SPEC frontmatter. Features without `clauses` in Applies don't have a CLAUSES.md and are not gated on it.
-- **5 per-feature commands** in §8.2 — `/vskit:clause add`, `/vskit:clause remove`, `/vskit:clause update`, `/vskit:clause check`, `/vskit:clause list`. Add/update auto-run an initial check so a baseline verdict always exists.
-- **2 global commands** in §8.3 — `/vskit:clause check-all` (re-check across all features) and `/vskit:clause audit` (read-only report of stale + failing clauses).
-- **Ship-gate integration** in §10.3 — High/Critical FAIL @ confidence ≥ 80% is a **hard block**; Medium FAIL @ ≥ 80% or stale (>14 days) is a **soft block**. Clauses with confidence < 60% are escalated to INDETERMINATE per INV-3.
-- **`templates/CLAUSES.md`** — copy-pastable template with active + removed/superseded tables.
-- **Worked example** — `example/features/demo-counter/CLAUSES.md` ships 3 realistic clauses (one FAIL, one PASS, one stale) demonstrating all three ship-gate states.
+- **§4.7 Rules** — new feature-scoped artifact (`RULES.md`). Each rule carries an ID, severity (Low/Medium/High/Critical), rule text, last spec check, last code check, top-5 enforcement files, and reasoning. Verdicts are PASS/FAIL/INDETERMINATE with a confidence percentage because the check is interpretive, not deterministic.
+- **`Applies: rules`** — opt-in declaration in SPEC frontmatter. Features without `rules` in Applies don't have a RULES.md and are not gated on it.
+- **5 per-feature commands** in §8.2 — `/vskit:rule add`, `/vskit:rule remove`, `/vskit:rule update`, `/vskit:rule check`, `/vskit:rule list`. Add/update auto-run an initial check so a baseline verdict always exists.
+- **2 global commands** in §8.3 — `/vskit:rule check-all` (re-check across all features) and `/vskit:rule audit` (read-only report of stale + failing rules).
+- **Ship-gate integration** in §10.3 — High/Critical FAIL @ confidence ≥ 80% is a **hard block**; Medium FAIL @ ≥ 80% or stale (>14 days) is a **soft block**. Rules with confidence < 60% are escalated to INDETERMINATE per INV-3.
+- **`templates/RULES.md`** — copy-pastable template with active + removed/superseded tables.
+- **Worked example** — `example/features/demo-counter/RULES.md` ships 3 realistic rules (one FAIL, one PASS, one stale) demonstrating all three ship-gate states.
 
 ### Why this isn't a 9th scoring dimension
-The eight dimensions in §7 produce a continuous 0–10 score and feed a composite. Clauses produce a discrete pass/fail per rule and feed the ship gate directly. Forcing them into the composite would either dilute the existing dimensions or hide individual clause failures behind an averaged number. Per INV-3 — surface failures, don't smooth them. See §4.7 closing paragraph.
+The eight dimensions in §7 produce a continuous 0–10 score and feed a composite. Rules produce a discrete pass/fail per rule and feed the ship gate directly. Forcing them into the composite would either dilute the existing dimensions or hide individual rule failures behind an averaged number. Per INV-3 — surface failures, don't smooth them. See §4.7 closing paragraph.
 
 ### Compatibility
-Backward-compatible. Existing v1.7 adopters continue to work unchanged; adding `clauses` to a feature's `Applies:` is opt-in. The ship-gate rules added in v1.8 only fire on clauses that actually exist.
+Backward-compatible. Existing v1.7 adopters continue to work unchanged; adding `rules` to a feature's `Applies:` is opt-in. The ship-gate rules added in v1.8 only fire on rules that actually exist.
 
 ### Deferred to 1.9
-- `/vskit:clause backfill` — propose initial clauses by reading SPEC + DECISIONS and surfacing candidate invariants.
-- Per-clause scorer override via a `Scorer:` row field (recognized in v1.8 but not yet acted on by all bundled scorers).
+- `/vskit:rule backfill` — propose initial rules by reading SPEC + DECISIONS and surfacing candidate invariants.
+- Per-rule scorer override via a `Scorer:` row field (recognized in v1.8 but not yet acted on by all bundled scorers).
 
 ---
 

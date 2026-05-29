@@ -534,11 +534,11 @@ Three fields are mandatory per migration; missing any field is a Dim 7 (Security
 | NFR (SPEC §4) | Aggregate measurable property | Per release (load test) | Number vs. threshold |
 | **Clause (RULES.md)** | **Invariant property that must hold across the codebase** | **Re-checked on demand** | **PASS / FAIL / INDETERMINATE + confidence 0–100% + reasoning** |
 
-**When to use a clause vs. an AC:** if the rule can be expressed as one test against one request, write an AC. If the rule is a property that has to hold across many code paths and would require many tests to verify deterministically — "no PII anywhere in logs," "no protected route lacks auth middleware," "every write op produces an audit row" — write a clause.
+**When to use a rule vs. an AC:** if the rule can be expressed as one test against one request, write an AC. If the property must hold across many code paths — "no PII anywhere in logs," "no protected route lacks auth middleware," "every write op produces an audit row" — write a rule.
 
 **Storage.** `docs/features/<slug>/RULES.md` per the template referenced from §4.2.1. Created on first `/vskit:rule add` or by `npx vskit add-feature` when `rules` is included in the feature's `Applies:` at scaffold time.
 
-**Per-clause record.** Every active clause carries:
+**Per-rule record.** Every active rule carries:
 
 - `RUL-NN` — sequential ID
 - **Rule** — one declarative sentence ("New users must accept terms before any data write")
@@ -550,17 +550,17 @@ Three fields are mandatory per migration; missing any field is a Dim 7 (Security
 
 **Confidence.** Rules are AI-graded; verdicts come with a confidence score because the underlying check is interpretive, not deterministic. A 100% confidence verdict is rare and suspect. Typical PASS lands at 80–95%; typical FAIL at 70–90%. Confidence below 60% should be treated as INDETERMINATE per INV-3 (don't present soft answers as hard ones).
 
-**Staleness.** A clause whose `Last code check` is older than **14 days** is **stale**. Stale rules with severity Medium or higher count as INDETERMINATE for ship-gate purposes — a soft block until refreshed. Run `/vskit:rule check <slug>` to re-evaluate.
+**Staleness.** A rule whose `Last code check` is older than **14 days** is **stale**. Stale rules with severity Medium or higher count as INDETERMINATE for ship-gate purposes — a soft block until refreshed. Run `/vskit:rule check <slug>` to re-evaluate.
 
 **Removal.** Active rules move to the `## Removed / Superseded Rules` table on removal, preserving the final verdict and reason. Same INV-1 audit pattern as DECISIONS supersession. Silent deletion is forbidden.
 
-**Update history.** Editing a clause's rule text or severity creates a new `RUL-NN+1` row and moves the old row to `## Removed / Superseded Rules` with `Supersedes: RUL-NN` marked. The new clause is auto-checked before the command exits so a baseline verdict exists.
+**Update history.** Editing a rule's rule text or severity creates a new `RUL-NN+1` row and moves the old row to `## Removed / Superseded Rules` with `Supersedes: RUL-NN` marked. The new clause is auto-checked before the command exits so a baseline verdict exists.
 
-**Drift coupling.** A clause whose last code-check verdict is FAIL surfaces in `SCORE.md ## Drift Findings` alongside the existing AC-drift findings. The two channels of drift detection (per-AC drift from Dim 1; per-clause drift from `/vskit:rule check`) share one report but originate from different commands.
+**Drift coupling.** A rule whose last code-check verdict is FAIL surfaces in `SCORE.md ## Drift Findings` alongside the existing AC-drift findings. The two channels of drift detection (per-AC drift from Dim 1; per-rule drift from `/vskit:rule check`) share one report but originate from different commands.
 
-**Scorer.** The default scorer for `/vskit:rule check` is `security-specialist`, since most rules encode invariants that are security-shaped. A clause may override via a `Scorer:` field in its row (e.g., `Scorer: perf-specialist` for a latency-invariant clause).
+**Scorer.** The default scorer for `/vskit:rule check` is `security-specialist`, since most rules encode invariants that are security-shaped. A rule may override via a `Scorer:` field in its row (e.g., `Scorer: perf-specialist` for a latency-invariant clause).
 
-**Why this isn't a 9th scoring dimension.** The eight dimensions in §7 produce a continuous 0–10 score and feed a composite. Rules produce a discrete pass/fail per rule and feed the ship gate (§10.3) directly. Forcing them into the composite would either dilute the existing dimensions or hide individual clause failures behind an averaged number. Per INV-3 — surface failures, don't smooth them.
+**Why this isn't a 9th scoring dimension.** The eight dimensions in §7 produce a continuous 0–10 score and feed a composite. Rules produce a discrete pass/fail per rule and feed the ship gate (§10.3) directly. Forcing them into the composite would either dilute the existing dimensions or hide individual rule failures behind an averaged number. Per INV-3 — surface failures, don't smooth them.
 
 ---
 
@@ -913,10 +913,10 @@ All commands are target-aware. Commands that operate on a specific feature or PR
 | `/vskit:test feature <slug>` | Run tests scoped to this feature. Report failures. | Test output; SCORE.md §test-coverage updated |
 | `/vskit:score feature <slug>` | Up to 8 parallel subagents evaluate scored dimensions (§7.1 Applies-aware). Dim 1 audits DECISIONS.md propagation. **Cache:** if `git diff <last_scored_sha>..HEAD -- docs/features/<slug>/ <SPEC Touches: paths>` produces no output, skip scoring and print `[cached] last_scored_sha=<sha> diff=clean` (exit 0). On miss, full re-score and update `last_scored_sha`. `--force` bypasses cache. | Updated `SCORE.md` (or `[cached]` line) |
 | `/vskit:prototype feature <slug>` | UX specialist generates HTML prototype from SPEC.md §3 ACs. | `docs/features/<slug>/prototypes/index.html` |
-| `/vskit:rule add <slug> "<rule>" [--severity=<low\|medium\|high\|critical>]` | Append a new `RUL-NN` row to `docs/features/<slug>/RULES.md` (creates the file and adds `rules` to `Applies:` if missing). Defaults severity to Medium. Runs `/vskit:rule check` for the new clause before exiting so a baseline verdict is recorded. | New CLAUSES row + baseline check result |
-| `/vskit:rule remove <slug> <clause-id>` | Move the named clause from the active table to `## Removed / Superseded Rules` with reason and final verdict. Confirmation required. Silent deletion forbidden (§4.7). | RULES.md updated; audit row preserved |
-| `/vskit:rule update <slug> <clause-id> "<new rule>" [--severity=<...>]` | Edit rule text or severity. Old row moves to Superseded with `Supersedes: RUL-NN`; new `RUL-NN+1` row inserted. Auto-runs `/vskit:rule check` so the new clause has a verdict. | RULES.md updated with old + new rows; new check result |
-| `/vskit:rule check <slug> [<clause-id>]` | Re-evaluate one (or all) active rules against the current SPEC and code. Default scorer `security-specialist` (override per-clause via `Scorer:` field). Updates last-spec-check and last-code-check rows with verdict, confidence, top-5 files, reasoning. Exit non-zero if any High/Critical FAIL @ confidence ≥ 80%. | RULES.md updated; ship-gate-relevant exit code |
+| `/vskit:rule add <slug> "<rule>" [--severity=<low\|medium\|high\|critical>]` | Append a new `RUL-NN` row to `docs/features/<slug>/RULES.md` (creates the file and adds `rules` to `Applies:` if missing). Defaults severity to Medium. Runs `/vskit:rule check` for the new rule before exiting so a baseline verdict is recorded. | New CLAUSES row + baseline check result |
+| `/vskit:rule remove <slug> <rule-id>` | Move the named rule from the active table to `## Removed / Superseded Rules` with reason and final verdict. Confirmation required. Silent deletion forbidden (§4.7). | RULES.md updated; audit row preserved |
+| `/vskit:rule update <slug> <rule-id> "<new rule>" [--severity=<...>]` | Edit rule text or severity. Old row moves to Superseded with `Supersedes: RUL-NN`; new `RUL-NN+1` row inserted. Auto-runs `/vskit:rule check` so the new rule has a verdict. | RULES.md updated with old + new rows; new check result |
+| `/vskit:rule check <slug> [<rule-id>]` | Re-evaluate one (or all) active rules against the current SPEC and code. Default scorer `security-specialist` (override per-rule via `Scorer:` field). Updates last-spec-check and last-code-check rows with verdict, confidence, top-5 files, reasoning. Exit non-zero if any High/Critical FAIL @ confidence ≥ 80%. | RULES.md updated; ship-gate-relevant exit code |
 | `/vskit:rule list <slug> [--status=<pass\|fail\|stale\|indeterminate>]` | Print all active rules for a feature, optionally filtered. Read-only. | Terminal report |
 
 | Command | Description | Output |
@@ -1015,15 +1015,15 @@ The gate has two tiers:
 - SCORE.md `last_scored_sha` is missing or empty (never scored), OR `git diff <last_scored_sha>..HEAD -- <feature scope>` is non-empty (stale — run `/vskit:score feature <slug>`). The per-feature scope is `docs/features/<slug>/` plus the SPEC `Touches:` pathspec (§8.2 cache rule).
 - DECISIONS.md contains a row whose `Updates` is empty and which is not in `## Deferred Items` (per §4.5; an unpropagated decision means the SPEC and code disagree)
 - SPEC §8 lists a `Blocked-by:` slug whose feature is not in `Shipped` state (per §4.1; blocker cannot ship downstream until upstream is live)
-- **(v1.8)** Any active clause (§4.7) with severity `High` or `Critical`, verdict `FAIL`, confidence ≥ 80% — against either spec OR code check.
+- **(v1.8)** Any active rule (§4.7) with severity `High` or `Critical`, verdict `FAIL`, confidence ≥ 80% — against either spec OR code check.
 
 **Soft block with logged waiver** (`/vskit:deploy` prompts; deployment proceeds only after a written waiver):
 - Composite < 8.0
 - Any scored non-security dimension < 7
 - E2E does not cover all happy-path ACs
-- **(v1.8)** Any active clause with severity `High` or `Critical`, verdict `FAIL`, confidence 60–79% (interpretive zone — surface, don't block hard).
-- **(v1.8)** Any active clause with severity `Medium`, verdict `FAIL`, confidence ≥ 80%.
-- **(v1.8)** Any active clause with severity `Medium` or higher, **stale** (last code check > 14 days). Run `/vskit:rule check <slug>` to clear.
+- **(v1.8)** Any active rule with severity `High` or `Critical`, verdict `FAIL`, confidence 60–79% (interpretive zone — surface, don't block hard).
+- **(v1.8)** Any active rule with severity `Medium`, verdict `FAIL`, confidence ≥ 80%.
+- **(v1.8)** Any active rule with severity `Medium` or higher, **stale** (last code check > 14 days). Run `/vskit:rule check <slug>` to clear.
 
 Low-severity FAIL rules are listed in the `/vskit:check deploy` report but do not gate. Critical FAIL rules where the scorer returns INDETERMINATE (confidence < 60%) escalate to a soft block — per INV-3, ambiguous answers don't get to pass as "clear."
 

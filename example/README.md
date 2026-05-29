@@ -1,6 +1,6 @@
 # Worked example — `demo-counter`
 
-This folder is a **populated example feature folder** to show what the framework looks like in motion. It is not real code — there is no implementation behind it. Read it after you finish [`../ADOPTION.md`](../ADOPTION.md) but before you fill out your own SPEC.
+This folder is a **populated example feature folder** to show what the framework looks like in motion. It is not real code — there is no implementation behind it. Run `npx @rafaelmelo007/vskit init` in your repo first, then use this example as a reference while filling out your own SPEC.
 
 ## What `demo-counter` does (hypothetically)
 

@@ -1,7 +1,7 @@
 # Rules — Click Counter
 
 **Feature:** demo-counter
-**Source:** /vskit:clause add | /vskit:clause check
+**Source:** /vskit:rule add | /vskit:rule check
 **Last updated:** 2026-05-23
 
 > Rules are invariant rules the feature must hold across the codebase (§4.7).
@@ -117,7 +117,7 @@ the second invocation fails because `CREATE TABLE` is not idempotent without `IF
 EXISTS`. The clause as stated requires idempotency, so a stricter reading says FAIL.
 The 2026-05-08 check accepted that the runner's dedup is sufficient and rated PASS at
 85%. This check is now 15 days old and is **stale** per §4.7 — counts as
-INDETERMINATE for ship-gate purposes. Re-run `/vskit:clause check demo-counter RUL-03`.
+INDETERMINATE for ship-gate purposes. Re-run `/vskit:rule check demo-counter RUL-03`.
 
 **Reasoning — last spec check (stale)**
 
@@ -149,9 +149,9 @@ to Medium with rationale, or removed with a written reason).
 
 | Action | Command |
 |---|---|
-| Add a new clause | `/vskit:clause add demo-counter "<rule>" --severity=high` |
-| Re-check one clause | `/vskit:clause check demo-counter RUL-01` |
-| Re-check all rules | `/vskit:clause check demo-counter` |
-| Edit rule text or severity | `/vskit:clause update demo-counter RUL-NN "<new rule>"` |
-| Remove a clause | `/vskit:clause remove demo-counter RUL-NN` |
-| List active rules | `/vskit:clause list demo-counter` |
+| Add a new rule | `/vskit:rule add demo-counter "<rule>" --severity=high` |
+| Re-check one rule | `/vskit:rule check demo-counter RUL-01` |
+| Re-check all rules | `/vskit:rule check demo-counter` |
+| Edit rule text or severity | `/vskit:rule update demo-counter RUL-NN "<new rule>"` |
+| Remove a rule | `/vskit:rule remove demo-counter RUL-NN` |
+| List active rules | `/vskit:rule list demo-counter` |
