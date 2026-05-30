@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <rect width="1200" height="675" fill="#09090d"/>
+
+  <!-- Terminal command -->
+  <rect x="300" y="160" width="600" height="52" rx="10" fill="#111118" stroke="#28283a" stroke-width="1"/>
+  <text x="330" y="192" font-family="'Courier New',monospace" font-size="16" fill="#7c6cf6">$</text>
+  <text x="356" y="192" font-family="'Courier New',monospace" font-size="16" fill="#e2e2e9">npx @rafaelmelo007/vskit init</text>
+  <rect x="860" y="179" width="10" height="18" rx="1" fill="#7c6cf6">
+    <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+  </rect>
+
+  <!-- Divider -->
+  <line x1="400" y1="264" x2="800" y2="264" stroke="#28283a" stroke-width="1"/>
+
+  <!-- Main tagline -->
+  <text x="600" y="360" font-family="system-ui,sans-serif" font-size="42" font-weight="800" fill="#ffffff" text-anchor="middle">AI writes. You control.</text>
+
+  <!-- Sub tagline -->
+  <text x="600" y="420" font-family="system-ui,sans-serif" font-size="18" fill="#62647a" text-anchor="middle">Every requirement traced. Every decision logged. Every feature scored.</text>
+
+  <!-- Subtle badge -->
+  <rect x="480" y="480" width="240" height="36" rx="18" fill="rgba(124,108,246,0.1)" stroke="rgba(124,108,246,0.3)" stroke-width="1"/>
+  <text x="600" y="503" font-family="'Courier New',monospace" font-size="13" fill="#a78bfa" text-anchor="middle">@rafaelmelo007/vskit</text>
+</svg>

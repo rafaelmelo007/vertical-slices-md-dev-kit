@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
+  <rect width="1200" height="675" fill="#09090d"/>
+  <rect x="100" y="50" width="1000" height="44" rx="8" fill="#111118" stroke="#28283a" stroke-width="1"/>
+  <text x="124" y="78" font-family="'Courier New',monospace" font-size="14" fill="#7c6cf6">$</text>
+  <text x="144" y="78" font-family="'Courier New',monospace" font-size="14" fill="#e2e2e9">/vskit:score auth</text>
+
+  <!-- Score rows -->
+  <!-- Documentation: 9 -->
+  <rect x="100" y="120" width="1000" height="42" rx="0" fill="#111118" stroke="#1e1e2a" stroke-width="1"/>
+  <text x="124" y="146" font-family="'Courier New',monospace" font-size="13" fill="#c4c5d6">Documentation</text>
+  <rect x="380" y="129" width="540" height="14" rx="7" fill="#1a1a24"/>
+  <rect x="380" y="129" width="486" height="14" rx="7" fill="rgba(74,222,128,0.35)"/>
+  <text x="938" y="146" font-family="'Courier New',monospace" font-size="13" font-weight="700" fill="#4ade80" text-anchor="end">9</text>
+
+  <!-- Test Coverage: 8 -->
+  <rect x="100" y="164" width="1000" height="42" rx="0" fill="#0f0f17" stroke="#1e1e2a" stroke-width="1"/>
+  <text x="124" y="190" font-family="'Courier New',monospace" font-size="13" fill="#c4c5d6">Test Coverage</text>
+  <rect x="380" y="173" width="540" height="14" rx="7" fill="#1a1a24"/>
+  <rect x="380" y="173" width="432" height="14" rx="7" fill="rgba(74,222,128,0.28)"/>
+  <text x="938" y="190" font-family="'Courier New',monospace" font-size="13" font-weight="700" fill="#4ade80" text-anchor="end">8</text>
+
+  <!-- Module Clarity: 9 -->
+  <rect x="100" y="208" width="1000" height="42" rx="0" fill="#111118" stroke="#1e1e2a" stroke-width="1"/>
+  <text x="124" y="234" font-family="'Courier New',monospace" font-size="13" fill="#c4c5d6">Module Clarity</text>
+  <rect x="380" y="217" width="540" height="14" rx="7" fill="#1a1a24"/>
+  <rect x="380" y="217" width="486" height="14" rx="7" fill="rgba(74,222,128,0.35)"/>
+  <text x="938" y="234" font-family="'Courier New',monospace" font-size="13" font-weight="700" fill="#4ade80" text-anchor="end">9</text>
+
+  <!-- Requirements Coverage: 10 -->
+  <rect x="100" y="252" width="1000" height="42" rx="0" fill="#0f0f17" stroke="#1e1e2a" stroke-width="1"/>
+  <text x="124" y="278" font-family="'Courier New',monospace" font-size="13" fill="#c4c5d6">Requirements Coverage</text>
+  <rect x="380" y="261" width="540" height="14" rx="7" fill="#1a1a24"/>
+  <rect x="380" y="261" width="540" height="14" rx="7" fill="rgba(74,222,128,0.5)"/>
+  <text x="938" y="278" font-family="'Courier New',monospace" font-size="13" font-weight="700" fill="#4ade80" text-anchor="end">10</text>
+
+  <!-- Logging: 7 -->
+  <rect x="100" y="296" width="1000" height="42" rx="0" fill="#111118" stroke="#1e1e2a" stroke-width="1"/>
+  <text x="124" y="322" font-family="'Courier New',monospace" font-size="13" fill="#c4c5d6">Logging</text>
+  <rect x="380" y="305" width="540" height="14" rx="7" fill="#1a1a24"/>
+  <rect x="380" y="305" width="378" height="14" rx="7" fill="rgba(251,191,36,0.3)"/>
+  <text x="938" y="322" font-family="'Courier New',monospace" font-size="13" font-weight="700" fill="#fbbf24" text-anchor="end">7</text>
+
+  <!-- Error Handling: 8 -->
+  <rect x="100" y="340" width="1000" height="42" rx="0" fill="#0f0f17" stroke="#1e1e2a" stroke-width="1"/>
+  <text x="124" y="366" font-family="'Courier New',monospace" font-size="13" fill="#c4c5d6">Error Handling</text>
+  <rect x="380" y="349" width="540" height="14" rx="7" fill="#1a1a24"/>
+  <rect x="380" y="349" width="432" height="14" rx="7" fill="rgba(74,222,128,0.28)"/>
+  <text x="938" y="366" font-family="'Courier New',monospace" font-size="13" font-weight="700" fill="#4ade80" text-anchor="end">8</text>
+
+  <!-- Security: 9 -->
+  <rect x="100" y="384" width="1000" height="42" rx="0" fill="#111118" stroke="#1e1e2a" stroke-width="1"/>
+  <text x="124" y="410" font-family="'Courier New',monospace" font-size="13" fill="#c4c5d6">Security</text>
+  <rect x="380" y="393" width="540" height="14" rx="7" fill="#1a1a24"/>
+  <rect x="380" y="393" width="486" height="14" rx="7" fill="rgba(74,222,128,0.35)"/>
+  <text x="938" y="410" font-family="'Courier New',monospace" font-size="13" font-weight="700" fill="#4ade80" text-anchor="end">9</text>
+
+  <!-- NFR Compliance: 8 -->
+  <rect x="100" y="428" width="1000" height="42" rx="0" fill="#0f0f17" stroke="#1e1e2a" stroke-width="1"/>
+  <text x="124" y="454" font-family="'Courier New',monospace" font-size="13" fill="#c4c5d6">NFR Compliance</text>
+  <rect x="380" y="437" width="540" height="14" rx="7" fill="#1a1a24"/>
+  <rect x="380" y="437" width="432" height="14" rx="7" fill="rgba(74,222,128,0.28)"/>
+  <text x="938" y="454" font-family="'Courier New',monospace" font-size="13" font-weight="700" fill="#4ade80" text-anchor="end">8</text>
+
+  <!-- Composite -->
+  <rect x="100" y="502" width="1000" height="56" rx="8" fill="rgba(74,222,128,0.06)" stroke="rgba(74,222,128,0.25)" stroke-width="1"/>
+  <text x="124" y="536" font-family="'Courier New',monospace" font-size="16" fill="#9395a8">Composite</text>
+  <text x="300" y="536" font-family="'Courier New',monospace" font-size="22" font-weight="700" fill="#4ade80">8.5</text>
+  <text x="370" y="536" font-family="system-ui,sans-serif" font-size="20" fill="#4ade80">✅</text>
+  <text x="420" y="536" font-family="system-ui,sans-serif" font-size="15" fill="#4ade80">Clear to ship</text>
+</svg>
