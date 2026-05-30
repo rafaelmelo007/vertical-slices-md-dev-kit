@@ -6,6 +6,24 @@ The format is loosely [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), 
 
 ---
 
+## [2.2.2] — 2026-05-30
+
+The "manifest" patch. Adds `MANIFEST.md` and `TESTPLAN.md` as unconditional outputs of `/vskit:prd-to-features` — files that were in use across all adopter repos but missing from the bundle spec and templates.
+
+### Added
+- **`templates/MANIFEST.md`** — generic template inventorying every file owned by a feature slice: endpoints, feature files, DB objects, frontend components, env vars.
+- **`templates/TESTPLAN.md`** — generic template linking every AC from SPEC.md §3 to at least one test case, grouped by layer (backend integration, frontend unit, E2E).
+- **`example/features/demo-counter/MANIFEST.md`** — worked example for the click-counter feature.
+- **`example/features/demo-counter/TESTPLAN.md`** — worked example mapping all 8 ACs to backend and frontend test cases.
+
+### Changed
+- **`commands/vskit/prd-to-features.md`** — `MANIFEST.md` and `TESTPLAN.md` added to the "Files created unconditionally" list. Output summary line updated to reflect the two new files.
+
+### Migration (v2.2.1 → v2.2.2)
+Existing feature folders do not get `MANIFEST.md` or `TESTPLAN.md` retroactively — the command only creates them for new features. To backfill existing features, copy `templates/MANIFEST.md` and `templates/TESTPLAN.md` into each `docs/features/<slug>/` folder manually.
+
+---
+
 ## [2.2] — 2026-05-29
 
 The "rule" release. Renames the `clause` concept to `rule` throughout for consistency with standard terminology. Adds `/vskit:enhance prd` as the canonical name for the PRD round-table command.

@@ -12,6 +12,8 @@
 - `TASKS.md` — headers only (ID | Description | Owner | Priority | Status | Linked ACs | Decision).
 - `SCORE.md` — all 8 dimensions initialized at 0, composite 0.0, no Score History rows.
 - `DECISIONS.md` — header only, empty Decision Log table, empty Deferred Items table.
+- `MANIFEST.md` — complete inventory of every file owned by this feature slice (endpoints, feature files, DB objects, frontend components, env vars). Starts as a stub; filled during implementation.
+- `TESTPLAN.md` — links every AC from SPEC.md §3 to at least one test case, grouped by layer (backend integration, frontend unit, E2E). Starts as a stub with rows pre-populated from ACs; filled during `/vskit:spec-to-tasks`.
 
 **Files created conditionally (only if declared in Applies):**
 - `DBSCHEMA.md` — if `dbschema` in Applies
@@ -22,7 +24,7 @@
 
 **Output:** after all folders are created, print a summary list:
 ```
-Created: docs/features/<slug>/  (files: SPEC, TASKS, SCORE, DECISIONS[, DBSCHEMA][, INTERFACE-CONTRACTS])
+Created: docs/features/<slug>/  (files: SPEC, TASKS, SCORE, DECISIONS, MANIFEST, TESTPLAN[, DBSCHEMA][, INTERFACE-CONTRACTS])
 ...
 Skipped: docs/features/<slug>/  (already exists)
 ```
