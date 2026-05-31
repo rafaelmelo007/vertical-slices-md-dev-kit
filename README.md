@@ -239,7 +239,9 @@ Every adopted feature lives in `docs/features/<slug>/`. **The point of this form
 | File | Required when | What it captures |
 |---|---|---|
 | [`SPEC.md`](#specmd--the-contract-always) | always | Problem, scope, independently-verifiable ACs, NFRs, test spec, open questions |
+| [`MANIFEST.md`](#manifestmd--file-inventory-always) | always | Complete inventory of every file owned by the feature slice |
 | [`TASKS.md`](#tasksmd--broken-from-acs-always) | always | Implementation tasks linked to ACs and decisions |
+| [`TESTPLAN.md`](#testplanmd--ac-to-test-mapping-always) | always | Links every AC to at least one test; gaps here are ship-gate blockers |
 | [`DECISIONS.md`](#decisionsmd--the-rationale-journal-always) | always | Every design decision: question, decision, rationale, what canonical file got updated |
 | [`SCORE.md`](#scoremd--quantified-quality-across-8-dimensions-always) | always | 8 dimensions scored 0–10, composite, ship-gate status, drift, history |
 | [`DBSCHEMA.md`](#dbschemamd--tables-and-migrations-when-applies-dbschema) | `Applies: dbschema` | Tables, indexes, migrations with Up + Down + back-compat assertion |
@@ -276,6 +278,40 @@ Each has a copy-paste skeleton in [`templates/`](./templates/). The [worked exam
 
 ---
 
+### `MANIFEST.md` — file inventory (always)
+
+**What it captures.** A complete, structured inventory of every file owned by the feature slice: backend endpoints, domain files, services, repositories, DTOs, tests, database objects (tables, indexes, migrations), frontend pages, components, services, and infrastructure changes (env vars, external services, Docker changes).
+
+- **One place to find everything a feature touches.** When a bug lands in this feature, you don't grep the repo — you open MANIFEST.md and go directly to the right file.
+- **Drift signal.** An outdated manifest means the feature has grown in ways the team hasn't acknowledged. `/vskit:score` Dim 1 (Documentation) drops when manifest entries don't match what exists on disk.
+- **Supports blast-radius analysis.** Before refactoring or deleting a file, MANIFEST tells you which features depend on it.
+
+**Example excerpt** ([`example/features/demo-counter/MANIFEST.md`](./example/features/demo-counter/MANIFEST.md)):
+
+```markdown
+## Backend
+
+### Endpoints
+| Method | Path | File |
+|--------|------|------|
+| POST | `/api/counter/increment` | `server/features/counter/endpoints/increment.ts` |
+| GET  | `/api/counter`           | `server/features/counter/endpoints/get.ts`       |
+
+### Feature files
+| Type | File |
+|------|------|
+| Service    | `server/features/counter/services/CounterService.ts`      |
+| Repository | `server/features/counter/repositories/CounterRepository.ts` |
+
+## Database
+| Object | Name | Migration file |
+|--------|------|----------------|
+| Table | `counters`           | `migrations/001_create_counters.sql` |
+| Index | `ix_counters_user_id` | `migrations/001_create_counters.sql` |
+```
+
+---
+
 ### `TASKS.md` — broken from ACs (always)
 
 **What it captures.** Implementation tasks derived from SPEC §3 ACs. Columns: ID, description, owner, priority, status, linked ACs, source decision ID.
@@ -292,6 +328,34 @@ Each has a copy-paste skeleton in [`templates/`](./templates/). The [worked exam
 | T-04 | Campaign-length cap at 64 chars + Unicode NFC | backend-lead | Medium | Done | AC-03 | D-02 |
 | T-05 | Per-IP rate limiter (60/min token bucket)     | backend-lead | High   | Done | AC-04 | D-01 |
 | T-08 | Unit + integration tests (TC-01..TC-04)       | testing-lead | High   | In Progress | AC-01..AC-06 | — |
+```
+
+---
+
+### `TESTPLAN.md` — AC-to-test mapping (always)
+
+**What it captures.** A table mapping every acceptance criterion from SPEC.md §3 to at least one concrete test, split by layer (backend integration, frontend unit, E2E). Also records edge cases and explicit out-of-scope items.
+
+- **An AC with no test is a ship-gate blocker.** The test plan is checked by `/vskit:score` Dim 2 (Test Coverage). A SPEC AC that isn't represented here is a gap — not assumed covered, explicitly absent.
+- **A test with no AC origin is a coverage orphan.** Every test row cites its `AC` column. Tests that can't trace back to a requirement are candidates for deletion.
+- **Edge cases are first-class.** The `## Edge Cases` section forces the team to name the off-happy-path scenarios explicitly before coding, rather than discovering them during code review.
+
+**Example excerpt** ([`example/features/demo-counter/TESTPLAN.md`](./example/features/demo-counter/TESTPLAN.md)):
+
+```markdown
+## Backend Tests
+
+| ID    | AC    | Description | Type | Priority |
+|-------|-------|-------------|------|----------|
+| BE-01 | AC-01 | `POST /click` with valid campaign returns 204 and increments count | Integration | Must |
+| BE-04 | AC-04 | 61st request from same IP within rolling minute returns 429 | Integration | Must |
+| BE-07 | AC-07 | Structured log includes `campaign` field; never includes client IP | Unit | Must |
+
+## Edge Cases
+
+- Concurrent increments for the same campaign must not lose counts (race condition)
+- Rate limit window resets correctly after 60 seconds
+- Campaign name at exactly 64 characters is accepted; at 65 is rejected
 ```
 
 ---
@@ -436,15 +500,17 @@ docs/features/<slug>/
   │   DBSCHEMA.md      ← schema (if dbschema in Applies)
   │   INTERFACE-CONTRACTS.md  ← endpoints (if interface-contracts in Applies)
   │     ↓
+  ├── MANIFEST.md      ← every file owned by this slice (inventory)
   ├── TASKS.md         ← broken from §3 ACs, tracked to Done
+  ├── TESTPLAN.md      ← every AC mapped to ≥1 test; gaps = ship blockers
   │     ↓ /vskit:implement feature
   │   code commits with Closes-AC: trailers
   │     ↓ /vskit:score feature
   ├── SCORE.md         ← 8 dims + composite + drift + history
-  └── RULES.md       ← invariants (if rules in Applies); re-checked by /vskit:rule check
+  └── RULES.md         ← invariants (if rules in Applies); re-checked by /vskit:rule check
 ```
 
-**Read order for a new feature:** SPEC → DECISIONS → CLAUSES (if any) → TASKS → SCORE. The first three are *what the feature is*; the last two are *how it gets built and graded*.
+**Read order for a new feature:** SPEC → MANIFEST → DECISIONS → RULES (if any) → TASKS → TESTPLAN → SCORE. The first three are *what the feature is and owns*; the rest are *how it gets built, tested, and graded*.
 
 ## What's in this repo
 
@@ -468,9 +534,11 @@ vertical-slices-md-dev-kit/
 ├── templates/
 │   ├── PRD.md                         ← §3.2 PRD template
 │   ├── SPEC.md                        ← §4.3 SPEC template
+│   ├── MANIFEST.md                    ← file inventory template
 │   ├── TASKS.md                       ← §4.4 tasks template
+│   ├── TESTPLAN.md                    ← AC-to-test mapping template
 │   ├── DECISIONS.md                   ← §4.5 decisions template
-│   ├── RULES.md                     ← §4.7 rules template (v1.8)
+│   ├── RULES.md                       ← §4.7 rules template (v1.8)
 │   └── SCORE.md                       ← §7.3 score template
 ├── example/
 │   └── features/demo-counter/         ← one fully-populated feature folder (incl. RULES.md)
